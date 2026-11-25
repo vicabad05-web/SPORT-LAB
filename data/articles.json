@@ -2,6 +2,90 @@
   "articles": [
     {
       "category": "Salud",
+      "icon": "🏥",
+      "type": "Investigación",
+      "title": "Mucho más que medicinas: ¿qué necesita la sociedad para afrontar la próxima pandemia?",
+      "teaser": "Gestionar una crisis sanitaria no es solo buscar tratamientos. La comunicación, la confianza y la salud mental son piezas clave que la ciencia ha analizado.",
+      "question": "¿Pensabas que gestionar una pandemia era únicamente un trabajo de biólogos y médicos en laboratorios?",
+      "study": "Un equipo de investigación en Austria analizó cómo personas de diversos ámbitos sociales y profesionales perciben la gestión de las pandemias. El objetivo fue entender qué prioridades, responsabilidades y medidas consideran esenciales ante futuras crisis sanitarias, más allá de la parte estrictamente biomédica.",
+      "method": "Los científicos realizaron un estudio cualitativo mediante entrevistas semiestructuradas a 28 participantes en Austria. Utilizaron 'viñetas' (descripciones de escenarios hipotéticos de pandemia) para plantear situaciones de crisis y analizaron los testimonios mediante un análisis temático inductivo para extraer las ideas principales.",
+      "results": "El estudio identificó cinco grandes temas compartidos por los participantes: 1) La necesidad de contar con expertos independientes de distintas disciplinas. 2) La comunicación transparente como base de la confianza y el cumplimiento de medidas. 3) La pandemia como reflejo de problemas sociales preexistentes, como la falta de solidaridad. 4) El valor de la gestión de datos fiables para tomar decisiones. 5) La educación y la salud mental como prioridades fundamentales en la respuesta.",
+      "explained": "Imagina que tu instituto organiza un evento gigante. Si la dirección no explica bien las normas o si no escucha a los alumnos, cundirá el caos aunque el plan sea perfecto en el papel. Este estudio demuestra que una pandemia es un desafío social y político, no solo un problema técnico. Si las personas no confían en la información, no se cuida la salud mental de los jóvenes o no se protegen las escuelas, la respuesta médica no funcionará de forma óptima.",
+      "limits": "Es un estudio cualitativo con una muestra pequeña de 28 personas en un país concreto (Austria). Por lo tanto, los resultados describen razonamientos y opiniones de ese grupo específico, pero no se pueden extrapolar estadísticamente a toda la población mundial ni permiten establecer relaciones de causa y efecto.",
+      "takeaway": "Estar preparados para futuras crisis sanitarias requiere reforzar la transparencia de las instituciones, la comunicación inclusiva, la protección de la educación y la salud mental antes de que aparezca la emergencia.",
+      "read_minutes": 5,
+      "quiz": [
+        {
+          "question": "¿Cuál fue el objetivo principal del estudio realizado en Austria?",
+          "options": [
+            "Probar una nueva vacuna en laboratorios",
+            "Explorar cómo razona la sociedad sobre las prioridades y la gestión de futuras pandemias",
+            "Medir el rendimiento físico de los estudiantes durante el confinamiento",
+            "Analizar el coste económico de los medicamentos en urgencias"
+          ],
+          "correct": 1,
+          "explanation": "El estudio buscaba comprender las experiencias, expectativas y razonamientos de la sociedad ante futuros escenarios de pandemia."
+        },
+        {
+          "question": "¿Qué herramienta metodológica emplearon los científicos en las entrevistas?",
+          "options": [
+            "Análisis de sangre y pruebas de esfuerzo",
+            "Encuestas masivas automatizadas por redes sociales",
+            "Viñetas o escenarios hipotéticos de pandemia",
+            "Exámenes escritos sobre biología molecular"
+          ],
+          "correct": 2,
+          "explanation": "Los investigadores utilizaron viñetas (casos o escenarios hipotéticos) para guiar las entrevistas semiestructuradas con los 28 participantes."
+        },
+        {
+          "question": "Según las conclusiones del estudio, la gestión de una pandemia es un reto...",
+          "options": [
+            "Pura y exclusivamente técnico y médico",
+            "Únicamente económico y comercial",
+            "Social y político, además de biomédico",
+            "Exclusivo de los deportistas de alto rendimiento"
+          ],
+          "correct": 2,
+          "explanation": "Los participantes entendieron la gobernanza de las pandemias como un desafío social y político integral, y no solo como un asunto técnico."
+        },
+        {
+          "question": "¿Cuál de los siguientes aspectos se identificó como una prioridad clave en la respuesta a las crisis?",
+          "options": [
+            "La educación y la salud mental",
+            "El cierre permanente de centros de investigación",
+            "La eliminación del análisis de datos",
+            "El aislamiento total de la comunidad científica"
+          ],
+          "correct": 0,
+          "explanation": "Entre los cinco temas principales identificados, la educación y la salud mental destacaron como prioridades fundamentales en la respuesta a la pandemia."
+        },
+        {
+          "question": "¿Qué limitación importante presenta esta investigación?",
+          "options": [
+            "Se inventaron los resultados al no entrevistar a nadie",
+            "No incluyó ninguna pregunta en las entrevistas",
+            "Tiene una muestra cualitativa pequeña (28 participantes) en un solo país",
+            "Demuestra causalidad matemática absoluta para todo el planeta"
+          ],
+          "correct": 2,
+          "explanation": "Al ser un estudio cualitativo con 28 entrevistas realizadas en Austria, sus datos ofrecen profundidad pero no se pueden generalizar a nivel global."
+        }
+      ],
+      "ai_model": "gemini-3.5-flash",
+      "id": "43080318",
+      "authors": "",
+      "paper_title": "Pandemic management and preparedness in Austria: experiences and expectations across society from a vignette-based qualitative study.",
+      "journal": "Frontiers in public health",
+      "year": "2026",
+      "doi": "10.3389/fpubh.2026.1918866",
+      "pmid": "43080318",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/43080318/",
+      "source": "PubMed",
+      "published_at": "2026-11-25",
+      "evidence_window_years": 5
+    },
+    {
+      "category": "Salud",
       "icon": "🧬",
       "type": "Investigación",
       "title": "El mapa oculto del VIH: vigilando la resistencia a los medicamentos",
