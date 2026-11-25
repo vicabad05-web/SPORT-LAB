@@ -1,0 +1,51 @@
+name: SPORT LAB - Publicar web
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'data/articles.json'
+      - '.github/workflows/deploy-site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: sport-lab-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar archivos
+        run: |
+          mkdir -p _site/data
+          cp index.html _site/index.html
+          cp data/articles.json _site/data/articles.json
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir archivos de la web
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Esperar registro del artefacto
+        run: sleep 20
+
+      - name: Publicar SPORT LAB
+        id: deployment
+        uses: actions/deploy-pages@v4
