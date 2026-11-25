@@ -40,15 +40,6 @@
 <footer class="footer"><div class="wrap"><strong>SPORT LAB</strong> · Ciencia que se juega.<br>Proyecto educativo de divulgación científica. Los contenidos son adaptaciones didácticas, no consejos médicos. Consulta siempre la publicación original y ten en cuenta sus limitaciones.</div></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL='https://qxoqygypmnrbzakpiylq.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY='sb_publishable_j12SLqB0ApdJMsUEfG-Yow_qcCc1VOk';
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
-let currentProfile=null;
-function makeStudentAlias(){
- const adjectives=['ATLETA','CURIOSO','RAPIDO','FUERTE','AGIL','VALIENTE','EXPLORADOR','CIENTIFICO'];
- const nouns=['AZUL','VERDE','ROJO','LOBO','HALCON','TIGRE','COMETA','RAYO'];
- return adjectives[Math.floor(Math.random()*adjectives.length)]+'_'+nouns[Math.floor(Math.random()*nouns.length)]+'_'+Math.floor(1000+Math.random()*9000);
-}
 let currentProfile=null;let supabaseClient=null;
 if(window.supabase&&window.supabase.createClient){const SUPABASE_URL='https://qxoqygypmnrbzakpiylq.supabase.co';const SUPABASE_PUBLISHABLE_KEY='sb_publishable_j12SLqB0ApdJMsUEfG-Yow_qcCc1VOk';supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY)}
 function aliasToLoginEmail(alias){return alias.trim().toLowerCase()+'@sportlab.invalid'}
