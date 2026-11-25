@@ -73,6 +73,11 @@ jobs:
         with:
           path: _site
 
+      # GitHub puede tardar unos segundos en hacer visible el artefacto
+      # de Pages en su API después de terminar la subida.
+      - name: Esperar a que GitHub registre el artefacto
+        run: sleep 20
+
       - name: Publicar SPORT LAB
         id: deployment
         uses: actions/deploy-pages@v4
