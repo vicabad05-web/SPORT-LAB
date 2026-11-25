@@ -6,21 +6,150 @@
 <title>SPORT LAB | Ciencia que se juega</title>
 <style>
 :root{--bg:#090f0e;--panel:#111b18;--panel2:#17231f;--line:#293a32;--lime:#c6ff00;--lime2:#a8db00;--text:#f2f7ef;--muted:#9eada4;--orange:#ffb454;--red:#ff6b6b;--radius:18px}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 85% -10%,#203323 0,transparent 36%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}.wrap{max-width:1180px;margin:auto;padding:0 22px}.top{position:sticky;top:0;z-index:10;background:#090f0eea;backdrop-filter:blur(16px);border-bottom:1px solid #24332c}.nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:11px;font-weight:950;letter-spacing:1.4px;font-size:20px}.brandmark{width:38px;height:38px;border-radius:12px;background:var(--lime);color:#10150a;display:grid;place-items:center;font-size:21px;box-shadow:0 0 25px #c6ff0038}.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:2.5px;font-weight:800;margin-top:2px}.navlinks{display:flex;gap:8px;align-items:center}.navlinks button,.ghost{background:transparent;border:1px solid transparent;color:var(--muted);padding:10px 13px;border-radius:10px;font-weight:750}.navlinks button:hover,.navlinks button.active{color:var(--lime);background:#c6ff0010;border-color:#c6ff0030}.profile{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:8px 12px;display:flex;align-items:center;gap:9px;font-weight:800}.avatar{width:28px;height:28px;background:#26372d;border-radius:9px;display:grid;place-items:center;color:var(--lime)}.hero{padding:54px 0 30px;display:grid;grid-template-columns:1.4fr .8fr;gap:28px;align-items:center}.eyebrow{color:var(--lime);font-size:11px;letter-spacing:2.5px;font-weight:900}.hero h1{font-size:clamp(42px,7vw,76px);line-height:.94;letter-spacing:-4px;margin:15px 0 18px;font-weight:950}.hero h1 span{color:var(--lime)}.hero p{max-width:610px;color:var(--muted);font-size:16px;line-height:1.7}.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.primary{border:0;background:var(--lime);color:#11180a;font-weight:950;padding:13px 18px;border-radius:11px;box-shadow:0 7px 25px #c6ff0024}.primary:hover{background:#d6ff45;transform:translateY(-1px)}.secondary{background:transparent;color:var(--text);border:1px solid var(--line);padding:12px 17px;border-radius:11px;font-weight:800}.hero-card{background:linear-gradient(145deg,#1a2b20,#101a17);border:1px solid #3c5635;border-radius:24px;padding:24px;min-height:250px;position:relative;overflow:hidden}.hero-card:after{content:'✳';position:absolute;font-size:190px;right:3px;bottom:-68px;color:#c6ff0012}.orbit{width:124px;height:124px;border:1px solid #c6ff0066;border-radius:50%;display:grid;place-items:center;margin:4px auto 18px;box-shadow:0 0 40px #c6ff0018}.orbit span{font-size:58px;filter:drop-shadow(0 0 15px #c6ff0066)}.hero-card h3{margin:0;text-align:center;font-size:18px}.hero-card p{text-align:center;margin:7px auto 0;font-size:12px;max-width:230px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0 40px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}.stat strong{display:block;font-size:25px;color:var(--lime)}.stat span{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:1px}.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:15px;margin:38px 0 17px}.sectionhead h2{font-size:26px;margin:7px 0 0;letter-spacing:-.7px}.sectionhead p{color:var(--muted);margin:0;font-size:13px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.chip{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:8px 13px;font-size:12px;font-weight:800}.chip.active,.chip:hover{background:#c6ff0015;border-color:#c6ff0070;color:var(--lime)}.articles{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.article{background:linear-gradient(160deg,#15211c,#101715);border:1px solid var(--line);border-radius:17px;overflow:hidden;display:flex;flex-direction:column;transition:.2s}.article:hover{transform:translateY(-4px);border-color:#c6ff0070;box-shadow:0 15px 40px #0005}.art-top{height:116px;padding:17px;display:flex;justify-content:space-between;align-items:start;background:radial-gradient(circle at 80% 25%,#c6ff0024,transparent 35%),#1b2b22}.art-icon{font-size:39px;filter:drop-shadow(0 0 10px #c6ff0055)}.tag{font-size:10px;font-weight:900;letter-spacing:1px;color:var(--lime);background:#c6ff0015;border:1px solid #c6ff0035;border-radius:99px;padding:6px 9px}.art-body{padding:17px;display:flex;flex-direction:column;flex:1}.art-body h3{font-size:18px;line-height:1.25;margin:8px 0}.art-body p{font-size:13px;color:var(--muted);line-height:1.55;margin:0 0 17px}.meta{font-size:11px;color:#82938a;margin-top:auto;padding-bottom:14px}.read{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:13px;color:var(--lime);font-size:12px;font-weight:900}.empty{grid-column:1/-1;padding:30px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center}.mission{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0 55px}.missionbox{border:1px solid var(--line);border-radius:17px;background:var(--panel);padding:20px}.missionbox h3{margin:9px 0 5px}.missionbox p{color:var(--muted);font-size:13px;line-height:1.55}.progress{height:8px;border-radius:20px;background:#26352e;overflow:hidden;margin:13px 0}.progress i{display:block;height:100%;background:var(--lime);width:0%;border-radius:20px}.footer{border-top:1px solid var(--line);padding:25px 0 35px;color:#718078;font-size:11px;line-height:1.7}.footer strong{color:var(--lime)}.view{display:none}.view.active{display:block}.article-view{max-width:850px;margin:36px auto 70px}.back{color:var(--lime);background:transparent;border:0;padding:0;font-weight:900;margin-bottom:20px}.article-head{border:1px solid var(--line);border-radius:20px;padding:28px;background:linear-gradient(145deg,#1b2a20,#101715)}.article-head h1{font-size:clamp(30px,5vw,48px);line-height:1.05;letter-spacing:-1.5px;margin:14px 0}.article-head p{color:var(--muted);line-height:1.7}.article-content{padding:18px 7px}.article-content h2{font-size:22px;margin:30px 0 9px}.article-content p,.article-content li{color:#c0cbc4;line-height:1.8;font-size:15px}.callout{background:#c6ff0010;border-left:3px solid var(--lime);padding:15px 18px;border-radius:0 12px 12px 0;margin:18px 0;color:#e8f3dc;line-height:1.7}.source{border:1px solid var(--line);border-radius:13px;padding:15px;margin-top:25px;color:var(--muted);font-size:12px;line-height:1.7}.source a{color:var(--lime)}.quiz{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:28px}.quiz h2{margin-top:0}.q{padding:14px 0;border-top:1px solid var(--line)}.q strong{display:block;margin-bottom:10px}.answer{display:block;width:100%;text-align:left;padding:11px 13px;background:#0c1411;border:1px solid var(--line);color:var(--text);border-radius:10px;margin:7px 0;font-size:13px}.answer:hover{border-color:var(--lime)}.answer.correct{border-color:#7bdc65;background:#7bdc6515}.answer.wrong{border-color:var(--red);background:#ff6b6b15}.result{font-weight:900;color:var(--lime);margin-top:14px}.hidden{display:none!important}.level{color:var(--lime)}@media(max-width:850px){.hero{grid-template-columns:1fr}.hero-card{display:none}.articles{grid-template-columns:repeat(2,1fr)}.navlinks button{padding:8px;font-size:11px}.profile .pname{display:inline!important;color:#d6ff59!important;font-weight:900}}@media(max-width:580px){.wrap{padding:0 15px}.nav{height:66px}.brand{font-size:16px}.navlinks{gap:0}.navlinks button{font-size:10px;padding:8px 7px}.profile{padding:5px}.profile .pname{display:inline!important;color:#d6ff59!important}.hero{padding:38px 0 20px}.hero h1{letter-spacing:-2px}.articles{grid-template-columns:1fr}.stats{gap:7px}.stat{padding:12px}.stat strong{font-size:21px}.mission{grid-template-columns:1fr}.sectionhead h2{font-size:22px}}
+.auth-overlay{position:fixed;inset:0;z-index:1000;background:#020705eF;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}.auth-overlay.hidden{display:none!important}.auth-card{position:relative;width:min(100%,460px);max-height:95vh;overflow:auto;background:#101b16;border:1px solid #526b34;border-radius:20px;padding:25px;box-shadow:0 20px 80px #000b}.auth-close{position:absolute;right:14px;top:10px;background:transparent;border:0;color:#d6ff59;font-size:30px}.auth-card h2{margin:10px 0;font-size:27px}.auth-intro,.auth-warning{color:#aebbb2;font-size:13px;line-height:1.6}.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:20px 0}.auth-tabs button{background:#17251e;border:1px solid #34463a;color:#aebbb2;border-radius:10px;padding:11px 7px;font-weight:900;font-size:11px}.auth-tabs button.active{color:#d6ff59;border-color:#c6ff00;background:#c6ff0015}.auth-card label{display:block;color:#d6ff59;font-size:12px;font-weight:900;margin:13px 0 7px}.auth-card input{width:100%;background:#08110d;color:#f2f7ef;border:1px solid #3a4b40;border-radius:10px;padding:13px;font-size:16px;outline:none}.auth-card input:focus{border-color:#c6ff00}.auth-card small{display:block;color:#9eada4;font-size:11px;margin-top:6px}.auth-submit{width:100%;margin-top:18px}.auth-message{color:#d6ff59;font-size:13px;font-weight:800;line-height:1.5;margin-top:12px;min-height:18px}.auth-warning{border-top:1px solid #34463a;padding-top:13px;margin-top:18px}@media(max-width:580px){.auth-card{padding:21px}.auth-card h2{font-size:23px}}
 </style>
 </head>
 <body>
 <header class="top"><div class="wrap nav"><div class="brand"><div class="brandmark">✳</div><div>SPORT LAB<small>SCIENCE · SPORT · HUMAN BODY</small></div></div><nav class="navlinks"><button class="active" data-nav="home">INICIO</button><button data-nav="library">LABORATORIO</button><button data-nav="progress">MI PROGRESO</button></nav><button class="profile" id="accountButton" type="button" onclick="startAnonymousSession()"><div class="avatar">⚡</div><span class="pname" id="accountName">ENTRAR</span><span class="level" id="navLevel">NV. 1</span></button></div></header>
 <div id="accountNotice" role="status" aria-live="polite" style="display:block;background:#202b16;border:1px solid #b8ff00;color:#d6ff59;padding:12px 16px;margin:12px auto;border-radius:10px;max-width:1100px;font-size:13px;font-weight:800;line-height:1.5">PULSA ENTRAR PARA CREAR TU PERFIL ANÓNIMO. NO NECESITAS DATOS PERSONALES.</div>
+<div id="authModal" class="auth-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+ <div class="auth-card">
+  <button type="button" class="auth-close" onclick="closeAuthModal()" aria-label="Cerrar">×</button>
+  <div class="eyebrow">// IDENTIDAD DEL INVESTIGADOR</div>
+  <h2 id="authTitle">Tu cuenta SPORT LAB</h2>
+  <p class="auth-intro">Crea tu alias y contraseña para acceder desde cualquier dispositivo. No necesitas correo ni datos personales.</p>
+  <div class="auth-tabs"><button type="button" id="authTabCreate" class="active" onclick="setAuthMode('create')">CREAR CUENTA</button><button type="button" id="authTabLogin" onclick="setAuthMode('login')">YA TENGO CUENTA</button></div>
+  <form id="authForm">
+   <label for="authAlias">Tu alias</label>
+   <input id="authAlias" name="alias" autocomplete="username" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" placeholder="Ej. RAYO_AZUL27" required>
+   <small>Entre 3 y 20 caracteres: letras, números o guion bajo.</small>
+   <label for="authPassword">Contraseña</label>
+   <input id="authPassword" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="Mínimo 8 caracteres" required>
+   <div id="authConfirmWrap"><label for="authConfirm">Repite la contraseña</label><input id="authConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="Vuelve a escribirla"></div>
+   <button id="authSubmit" class="primary auth-submit" type="submit">CREAR MI CUENTA</button>
+   <div id="authMessage" class="auth-message" role="status" aria-live="polite"></div>
+  </form>
+  <p class="auth-warning">Guarda tu alias y contraseña en un lugar seguro. Sin correo de recuperación, si olvidas la contraseña no podremos verificar que la cuenta es tuya.</p>
+ </div>
+</div>
 <main class="wrap">
 <section id="home" class="view active">
 <div class="hero"><div><div class="eyebrow">// BIENVENIDO A TU NUEVO LABORATORIO</div><h1>LA CIENCIA<br>ESTÁ EN <span>TU CUERPO.</span></h1><p>¿Puede el ejercicio ayudarte a pensar mejor? ¿Por qué late más rápido tu corazón? ¿Qué ocurre mientras duermes? Descubre las respuestas detrás de la ciencia del deporte.</p><div class="hero-actions"><button class="primary" onclick="showView('library')">EXPLORAR INVESTIGACIONES ↗</button><button class="secondary" onclick="showView('progress')">VER MI PROGRESO</button></div></div><div class="hero-card"><div class="orbit"><span>🧬</span></div><h3>ACTIVA TU CURIOSIDAD</h3><p>Investiga. Responde. Consigue XP. Sube de nivel.</p></div></div>
 <div class="stats"><div class="stat"><strong id="statArticles">03</strong><span>INVESTIGACIONES</span></div><div class="stat"><strong>03</strong><span>PUBLICACIONES / SEMANA</span></div><div class="stat"><strong id="statXp">0 XP</strong><span>TU EXPERIENCIA</span></div></div>
 <div class="sectionhead"><div><div class="eyebrow">// RECIÉN LLEGADO AL LABORATORIO</div><h2>Investiga algo nuevo</h2></div><p>Descubre la ciencia que hay detrás del movimiento.</p></div><div id="featured" class="articles"></div>
-<div class="sectionhead"><div><div class="eyebrow">// TU SIGUIENTE MISIÓN</div><h2>El conocimiento se entrena</h2></div></div><div class="mission"><div class="missionbox"><div class="eyebrow">MISIÓN SEMANAL</div><h3>Completa una investigación</h3><p>Lee un artículo y responde su desafío científico para conseguir experiencia.</p><div class="progress"><i id="missionBar"></i></div><small id="missionText" style="color:var(--muted)">0 de 1 investigaciones completadas</small></div><div class="missionbox"><div class="eyebrow">RECOMPENSA</div><h3>🏅 Explorador científico</h3><p>Consigue tu primera insignia al completar un cuestionario.</p><strong style="color:var(--lime)">+100 XP</strong></div></div>
-</section>
-<section id="library" class="view"><div class="sectionhead" style="margin-top:45px"><div><div class="eyebrow">// BASE DE CONOCIMIENTO</div><h2>Laboratorio de investigaciones</h2><p>Artículos explicados a partir de publicaciones científicas.</p></div></div><div class="filters" id="filters"><button class="chip active" data-filter="Todas">TODAS</button><button class="chip" data-filter="Cerebro">🧠 CEREBRO</button><button class="chip" data-filter="Rendimiento">💪 RENDIMIENTO</button><button class="chip" data-filter="Cuerpo humano">🫀 CUERPO HUMANO</button></div><div id="libraryCards" class="articles"></div></section>
-<section id="progress" class="view"><div class="sectionhead" style="margin-top:45px"><div><div class="eyebrow">// IDENTIDAD DEL INVESTIGADOR</div><h2>Tu progreso</h2><p>Tu experiencia se guarda en este dispositivo y navegador.</p></div></div><div class="mission"><div class="missionbox"><div class="eyebrow">NIVEL ACTUAL</div><h3 id="bigLevel" style="font-size:38px;color:var(--lime)">NV. 1</h3><p id="levelName">Novato científico</p><div class="progress"><i id="levelBar"></i></div><small id="levelProgress" style="color:var(--muted)">0 / 250 XP para el siguiente nivel</small></div><div class="missionbox"><div class="eyebrow">EXPERIENCIA TOTAL</div><h3 id="bigXp" style="font-size:38px;color:var(--lime)">0 XP</h3><p>Gana 100 XP por cada cuestionario completado por primera vez.</p></div></div><div class="sectionhead"><div><div class="eyebrow">// LOGROS DESBLOQUEABLES</div><h2>Tus insignias</h2></div></div><div id="badges" class="articles"></div></section>
-<section id="articleView" class="view"><div class="article-view"><button class="back" onclick="showView('library')">← VOLVER AL LABORATORIO</button><div id="articleDetail"></div></div></section>
+<div class="sectionhead"><div><div class="eyebrow">// TU SIGUIENTE MISIÓN</div><h2>El conocimiento se entrena</h2></div></div><div class="mission"><dfunction aliasToLoginEmail(alias){return alias.trim().toLowerCase()+'@sportlab.invalid'}
+function setAuthMode(mode){
+ const create=mode==='create';
+ document.getElementById('authTabCreate').classList.toggle('active',create);
+ document.getElementById('authTabLogin').classList.toggle('active',!create);
+ document.getElementById('authTitle').textContent=create?'Crea tu cuenta':'Entra en tu cuenta';
+ document.getElementById('authConfirmWrap').classList.toggle('hidden',!create);
+ document.getElementById('authPassword').autocomplete=create?'new-password':'current-password';
+ document.getElementById('authSubmit').textContent=create?'CREAR MI CUENTA':'ENTRAR EN SPORT LAB';
+ document.getElementById('authMessage').textContent='';
+ document.getElementById('authForm').dataset.mode=mode;
+}
+function openAuthModal(){
+ document.getElementById('authModal').classList.remove('hidden');
+ setAuthMode('create');
+ document.getElementById('authAlias').focus();
+}
+function closeAuthModal(){document.getElementById('authModal').classList.add('hidden')}
+async function startAnonymousSession(){
+ const sessionResult=await supabaseClient.auth.getSession();
+ if(sessionResult.error){document.getElementById('accountNotice').textContent='No se pudo comprobar la sesión: '+sessionResult.error.message;return}
+ if(sessionResult.data.session && !sessionResult.data.session.user.is_anonymous){
+  await loadSignedInProfile(sessionResult.data.session.user);
+ }else{openAuthModal()}
+}
+async function loadSignedInProfile(user){
+ const notice=document.getElementById('accountNotice');
+ try{
+  const result=await supabaseClient.from('profiles').select('alias,xp').eq('id',user.id).single();
+  if(result.error) throw result.error;
+  currentProfile=result.data;
+  state.xp=Number(currentProfile.xp)||0;
+  saveState();
+  document.getElementById('accountName').textContent=currentProfile.alias;
+  document.getElementById('navLevel').textContent='NV. '+(Math.floor(state.xp/250)+1);
+  notice.textContent='Sesión iniciada como '+currentProfile.alias+'. Tu cuenta está conectada.';
+ }catch(error){notice.textContent='No se pudo cargar tu perfil: '+error.message;console.error(error)}
+}
+document.getElementById('authForm').addEventListener('submit',async function(event){
+ event.preventDefault();
+ const form=this,mode=form.dataset.mode||'create';
+ const aliasInput=document.getElementById('authAlias');
+ const alias=aliasInput.value.trim().toUpperCase();
+ const password=document.getElementById('authPassword').value;
+ const confirm=document.getElementById('authConfirm').value;
+ const message=document.getElementById('authMessage');
+ const submit=document.getElementById('authSubmit');
+ if(!/^[A-Z0-9_]{3,20}$/.test(alias)){message.textContent='El alias debe tener entre 3 y 20 caracteres: letras, números o guion bajo.';return}
+ if(password.length<8){message.textContent='La contraseña debe tener al menos 8 caracteres.';return}
+ if(mode==='create' && password!==confirm){message.textContent='Las contraseñas no coinciden.';return}
+ submit.disabled=true;message.textContent=mode==='create'?'Creando tu cuenta segura...':'Comprobando tus datos...';
+ try{
+  const email=aliasToLoginEmail(alias);
+  let authResult;
+  if(mode==='create'){
+   const current=await supabaseClient.auth.getSession();
+   const existing=current.data?.session?.user;
+   if(existing?.is_anonymous){
+    authResult=await supabaseClient.auth.updateUser({email,password,data:{alias}});
+   }else{
+    authResult=await supabaseClient.auth.signUp({email,password,options:{data:{alias}}});
+   }
+  }else{
+   authResult=await supabaseClient.auth.signInWithPassword({email,password});
+  }
+  if(authResult.error) throw authResult.error;
+  const user=authResult.data.user;
+  const session=authResult.data.session;
+  if(!user) throw new Error('Supabase no ha devuelto el usuario.');
+  if(!session && mode==='create') throw new Error('La cuenta se ha creado, pero Supabase no ha iniciado sesión. Comprueba que la confirmación de correo está desactivada en Supabase Auth.');
+  let profileResult=await supabaseClient.from('profiles').select('alias,xp').eq('id',user.id).maybeSingle();
+  if(profileResult.error) throw profileResult.error;
+  let profile=profileResult.data;
+  if(!profile){
+   const insert=await supabaseClient.from('profiles').insert({id:user.id,alias:alias,xp:0});
+   if(insert.error) throw insert.error;
+   profileResult=await supabaseClient.from('profiles').select('alias,xp').eq('id',user.id).single();
+   if(profileResult.error) throw profileResult.error;
+   profile=profileResult.data;
+  }else if(profile.alias!==alias){
+   const update=await supabaseClient.from('profiles').update({alias}).eq('id',user.id);
+   if(update.error) throw update.error;
+   profile={...profile,alias};
+  }
+  currentProfile=profile;
+  state.xp=Number(profile.xp)||0;saveState();
+  document.getElementById('accountName').textContent=profile.alias;
+  document.getElementById('navLevel').textContent='NV. '+(Math.floor(state.xp/250)+1);
+  document.getElementById('accountNotice').textContent='¡Bienvenido, '+profile.alias+'! Tu cuenta ya está vinculada a una contraseña y puedes usarla desde otros dispositivos.';
+  closeAuthModal();
+  form.reset();
+ }catch(error){
+  console.error('SPORT LAB account error:',error);
+  const msg=(error.message||'Error desconocido').toLowerCase();
+  if(msg.includes('already registered')||msg.includes('already been registered')||msg.includes('user already')){
+   message.textContent='Ese alias ya está registrado. Elige otro o utiliza «YA TENGO CUENTA».';
+  }else if(msg.includes('invalid login credentials')){
+   message.textContent='Alias o contraseña incorrectos. Comprueba los datos.';
+  }else if(msg.includes('duplicate key')||msg.includes('unique constraint')){
+   message.textContent='Ese alias ya está ocupado. Prueba con otro.';
+  }else{
+   message.textContent='No se pudo completar la operación: '+(error.code?error.code+' — ':'')+error.message;
+  }
+ }finally{submit.disabled=false}
+});
+async function restoreAccountSession(){
+ try{
+  const result=await supabaseClient.auth.getSession();
+  if(result.data?.session?.user && !result.data.session.user.is_anonymous) await loadSignedInProfile(result.data.session.user);
+ }catch(error){console.error('SPORT LAB session restore:',error)}
+}
+restoreAccountSession();
+le-view"><button class="back" onclick="showView('library')">← VOLVER AL LABORATORIO</button><div id="articleDetail"></div></div></section>
 </main>
 <footer class="footer"><div class="wrap"><strong>SPORT LAB</strong> · Ciencia que se juega.<br>Proyecto educativo de divulgación científica. Los contenidos son adaptaciones didácticas, no consejos médicos. Consulta siempre la publicación original y ten en cuenta sus limitaciones.</div></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
