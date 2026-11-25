@@ -12,7 +12,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: sport-lab-publicacion
   cancel-in-progress: false
 
 jobs:
@@ -39,13 +39,19 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/fetch_articles.py
 
-      - name: Guardar publicaciones en GitHub
+      - name: Sincronizar y guardar publicaciones
         run: |
           git config user.name "SPORT LAB Bot"
           git config user.email "actions@github.com"
+
           git add data/articles.json
-          git diff --cached --quiet || git commit -m "Actualizacion SPORT LAB"
-          git push
+
+          if ! git diff --cached --quiet; then
+            git commit -m "Actualizacion SPORT LAB"
+          fi
+
+          git pull --rebase origin main
+          git push origin HEAD:main
 
       - name: Preparar web para publicar
         run: |
