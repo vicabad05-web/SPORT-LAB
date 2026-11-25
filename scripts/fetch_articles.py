@@ -1,183 +1,779 @@
+
 #!/usr/bin/env python3
-"""SPORT LAB: busca estudios OA de los últimos 5 años y crea un artículo educativo.
-Requiere GEMINI_API_KEY como variable de entorno. Solo usa biblioteca estándar.
-La IA debe ceñirse al texto del artículo científico; los metadatos bibliográficos
-se copian de Europe PMC y nunca se inventan. Si no hay evidencia suficiente, no publica.
-"""
+# ============================================================
+# SPORT LAB
+# Buscador y redactor automatico de articulos cientificos
+# Investigaciones de los ultimos cinco anos
+# ============================================================
+
 import json
 import os
 import re
-import sys
 import time
 import urllib.parse
 import urllib.request
 import urllib.error
 import xml.etree.ElementTree as ET
-from datetime import date, datetime, timedelta, timezone
+
+from datetime import date, datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+
+# ------------------------------------------------------------
+# CONFIGURACION
+# ------------------------------------------------------------
 
 ROOT = Path(__file__).resolve().parents[1]
+
 ARTICLES_FILE = ROOT / "data" / "articles.json"
-MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
-ALLOWED_CATEGORIES = {"Cerebro", "Rendimiento", "Cuerpo humano", "Nutrición", "Descanso", "Salud"}
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+
+GEMINI_MODEL = os.getenv(
+    "GEMINI_MODEL",
+    "gemini-2.5-flash"
+)
+
+EUROPE_PMC = (
+    "https://www.ebi.ac.uk/europepmc/"
+    "webservices/rest"
+)
+
+CATEGORIES = [
+    "Cerebro",
+    "Rendimiento",
+    "Cuerpo humano",
+    "Nutrición",
+    "Descanso",
+    "Salud"
+]
+
+USER_AGENT = "SPORT-LAB/2.0 educational science project"
 
 
-def get_json(url, headers=None, timeout=45):
-    req = urllib.request.Request(url, headers=headers or {"User-Agent": "SPORT-LAB/2.0 educational science project"})
-    with urllib.request.urlopen(req, timeout=timeout) as response:
-        return json.loads(response.read().decode("utf-8"))
+# ------------------------------------------------------------
+# PETICIONES HTTP CON REINTENTOS
+# ------------------------------------------------------------
 
+def request_url(url, timeout=120, attempts=3):
 
-def europe_pmc_candidates(existing_ids):
-    today = date.today()
-    start = today.replace(year=today.year - 5)
-    query = (
-        'OPEN_ACCESS:Y AND HAS_ABSTRACT:Y AND (TITLE_ABS:exercise OR TITLE_ABS:"physical activity" '
-        'OR TITLE_ABS:sport OR TITLE_ABS:sleep OR TITLE_ABS:nutrition OR TITLE_ABS:hydration) '
-        'AND (TITLE_ABS:adolescent OR TITLE_ABS:children OR TITLE_ABS:youth) '
-        f'AND FIRST_PDATE:[{start.isoformat()} TO {today.isoformat()}]'
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "*/*"
+        }
     )
-    params = urllib.parse.urlencode({"query": query, "format": "json", "pageSize": 100, "sort": "FIRST_PDATE_D desc"})
-    data = get_json("https://www.ebi.ac.uk/europepmc/webservices/rest/search?" + params)
-    out = []
-    for item in data.get("resultList", {}).get("result", []):
-        pmcid, pmid, doi = item.get("pmcid"), item.get("pmid"), item.get("doi")
-        if not pmcid or not (pmid or doi):
-            continue
-        ident = "pmid-" + str(pmid) if pmid else "doi-" + re.sub(r"[^a-zA-Z0-9]+", "-", doi)
-        if ident in existing_ids:
-            continue
+
+    last_error = None
+
+    for attempt in range(attempts):
+
         try:
-            xml_url = f"https://www.ebi.ac.uk/europepmc/webservices/rest/{pmcid}/fullTextXML"
-            req = urllib.request.Request(xml_url, headers={"User-Agent": "SPORT-LAB/2.0"})
-            with urllib.request.urlopen(req, timeout=30) as response:
-                xml_text = response.read().decode("utf-8", errors="replace")
-            root = ET.fromstring(xml_text)
-            paragraphs = []
-            for node in root.iter():
-                if node.tag.split("}")[-1] in {"title", "p"}:
-                    txt = " ".join("".join(node.itertext()).split())
-                    if len(txt) > 45:
-                        paragraphs.append(txt)
-            full_text = "\n".join(paragraphs)
-            if len(full_text) < 1800:
-                continue
-        except Exception:
-            continue
-        out.append({
-            "id": ident, "title": item.get("title", ""),
-            "authors": item.get("authorString", ""),
-            "journal": item.get("journalTitle", ""),
-            "year": str(item.get("pubYear", "")),
-            "doi": doi or "", "pmid": str(pmid or ""), "pmcid": pmcid,
-            "abstract": item.get("abstractText", ""),
-            "pub_types": item.get("pubTypeList", {}).get("pubType", []),
-            "source_url": f"https://europepmc.org/article/MED/{pmid}" if pmid else f"https://europepmc.org/article/PMC/{pmcid}",
-            "full_text": full_text[:26000]
-        })
-    return out
+            with urllib.request.urlopen(
+                request,
+                timeout=timeout
+            ) as response:
+
+                return response.read()
+
+        except Exception as error:
+
+            last_error = error
+
+            print(
+                f"Intento {attempt + 1}/{attempts} "
+                f"fallido: {error}"
+            )
+
+            if attempt < attempts - 1:
+                time.sleep(5 * (attempt + 1))
+
+    raise RuntimeError(
+        f"No se pudo completar la petición: {last_error}"
+    )
 
 
-def call_gemini(candidate, api_key):
-    prompt = f'''Eres el redactor científico de SPORT LAB, una plataforma educativa para alumnado español de 12 a 16 años.
-Redacta UN artículo didáctico en español usando EXCLUSIVAMENTE la evidencia que aparece en la ficha y el texto científico incluidos abajo.
-No inventes cifras, resultados, mecanismos, muestras, fechas, autores ni conclusiones. Distingue asociación de causalidad. Si el artículo no permite responder con seguridad, devuelve {{"publish": false, "reason": "..."}}.
-No hagas recomendaciones médicas individuales. Lenguaje claro, atractivo y riguroso. No afirmes que un resultado se aplica a todos los adolescentes si la muestra no lo permite.
+def get_json(url):
 
-Devuelve JSON puro con estas claves exactas:
-{{"publish":true,"category":"Cerebro|Rendimiento|Cuerpo humano|Nutrición|Descanso|Salud","icon":"emoji","type":"TIPO DE ESTUDIO","title":"pregunta atractiva","teaser":"2 frases","question":"pregunta central","study":"qué investigaron","method":"cómo lo estudiaron, muestra y método si constan","results":"resultados fieles al texto","explained":"explicación para ESO","limits":"limitaciones explícitas y cautelas","takeaway":"idea clave prudente","read_minutes":5,"quiz":[{{"q":"pregunta","options":["A","B","C"],"correct":0,"explanation":"por qué"}}]}}
-El cuestionario debe contener EXACTAMENTE 5 preguntas, 3 opciones cada una, una sola respuesta correcta, y explicaciones. Debe evaluar el contenido real, no conocimientos externos. No incluyas autores, revista, DOI ni URL en el JSON: se añadirán desde los metadatos originales.
+    content = request_url(
+        url,
+        timeout=120,
+        attempts=3
+    )
 
-FICHA BIBLIOGRÁFICA VERIFICADA (no modificar):
-Título: {candidate['title']}
-Autores: {candidate['authors']}
-Revista: {candidate['journal']}
-Año: {candidate['year']}
-DOI: {candidate['doi']}
-PMID: {candidate['pmid']}
-PMCID: {candidate['pmcid']}
-Resumen: {candidate['abstract']}
+    return json.loads(
+        content.decode("utf-8")
+    )
 
-TEXTO DEL ARTÍCULO (extracto del texto completo en Europe PMC):
-{candidate['full_text']}
-'''
-    payload = {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"temperature": 0.2, "responseMimeType": "application/json"}}
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={urllib.parse.quote(api_key)}"
-    req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"}, method="POST")
+
+# ------------------------------------------------------------
+# CARGAR ARTICULOS EXISTENTES
+# ------------------------------------------------------------
+
+def load_articles():
+
+    ARTICLES_FILE.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    if not ARTICLES_FILE.exists():
+        return {"articles": []}
+
     try:
-        with urllib.request.urlopen(req, timeout=120) as response:
-            result = json.loads(response.read().decode())
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")[:1200]
-        raise RuntimeError(f"Gemini API devolvió HTTP {exc.code}: {detail}")
-    text = result["candidates"][0]["content"]["parts"][0]["text"]
+        data = json.loads(
+            ARTICLES_FILE.read_text(
+                encoding="utf-8"
+            )
+        )
+
+        if isinstance(data, list):
+            return {"articles": data}
+
+        if not isinstance(data, dict):
+            return {"articles": []}
+
+        if not isinstance(data.get("articles"), list):
+            data["articles"] = []
+
+        return data
+
+    except Exception as error:
+
+        raise RuntimeError(
+            f"No se pudo leer articles.json: {error}"
+        )
+
+
+# ------------------------------------------------------------
+# DESCARGAR TEXTO CIENTIFICO
+# ------------------------------------------------------------
+
+def get_full_text(pmcid):
+
+    url = (
+        f"{EUROPE_PMC}/{pmcid}/fullTextXML"
+    )
+
+    try:
+
+        content = request_url(
+            url,
+            timeout=60,
+            attempts=2
+        )
+
+        root = ET.fromstring(content)
+
+        paragraphs = []
+
+        for node in root.iter():
+
+            tag = node.tag.split("}")[-1]
+
+            if tag not in ("title", "p"):
+                continue
+
+            text = " ".join(
+                "".join(node.itertext()).split()
+            )
+
+            if len(text) > 45:
+                paragraphs.append(text)
+
+        return "\n".join(paragraphs)[:16000]
+
+    except Exception as error:
+
+        print(
+            f"No se pudo descargar el texto completo "
+            f"de {pmcid}: {error}"
+        )
+
+        return ""
+
+
+# ------------------------------------------------------------
+# BUSCAR INVESTIGACIONES DE LOS ULTIMOS CINCO ANOS
+# ------------------------------------------------------------
+
+def find_studies(existing_ids):
+
+    today = date.today()
+
+    start_year = today.year - 5
+
+    start_date = date(
+        start_year,
+        today.month,
+        min(today.day, 28)
+    )
+
+    query = (
+        'OPEN_ACCESS:Y AND HAS_ABSTRACT:Y AND '
+        '(TITLE_ABS:exercise OR '
+        'TITLE_ABS:"physical activity" OR '
+        'TITLE_ABS:sport OR '
+        'TITLE_ABS:sleep OR '
+        'TITLE_ABS:nutrition OR '
+        'TITLE_ABS:hydration OR '
+        'TITLE_ABS:muscle OR '
+        'TITLE_ABS:brain) AND '
+        '(TITLE_ABS:adolescent OR '
+        'TITLE_ABS:children OR '
+        'TITLE_ABS:youth OR '
+        'TITLE_ABS:young) AND '
+        f'FIRST_PDATE:[{start_date.isoformat()} '
+        f'TO {today.isoformat()}]'
+    )
+
+    params = urllib.parse.urlencode({
+        "query": query,
+        "format": "json",
+        "pageSize": 25,
+        "sort": "FIRST_PDATE_D"
+    })
+
+    url = (
+        f"{EUROPE_PMC}/search?{params}"
+    )
+
+    print("Buscando investigaciones en Europe PMC...")
+
+    data = get_json(url)
+
+    results = data.get(
+        "resultList", {}
+    ).get("result", [])
+
+    candidates = []
+
+    for item in results:
+
+        pmcid = item.get("pmcid")
+        pmid = item.get("pmid")
+        doi = item.get("doi")
+
+        if not pmcid:
+            continue
+
+        identifier = (
+            f"pmid-{pmid}"
+            if pmid
+            else f"pmcid-{pmcid}"
+        )
+
+        if identifier in existing_ids:
+            continue
+
+        try:
+
+            publication_date = item.get(
+                "firstPublicationDate", ""
+            )
+
+            publication_year = int(
+                item.get("pubYear", 0)
+            )
+
+            if not publication_date:
+                continue
+
+            published = date.fromisoformat(
+                publication_date[:10]
+            )
+
+            if published < start_date or published > today:
+                continue
+
+            if not item.get("abstractText"):
+                continue
+
+            full_text = get_full_text(pmcid)
+
+            candidates.append({
+
+                "id": identifier,
+
+                "title": item.get(
+                    "title", ""
+                ),
+
+                "authors": item.get(
+                    "authorString", ""
+                ),
+
+                "journal": item.get(
+                    "journalTitle", ""
+                ),
+
+                "year": publication_year,
+
+                "publication_date": publication_date,
+
+                "doi": doi or "",
+
+                "pmid": str(pmid or ""),
+
+                "pmcid": pmcid,
+
+                "abstract": item.get(
+                    "abstractText", ""
+                ),
+
+                "full_text": full_text,
+
+                "url": (
+                    f"https://europepmc.org/article/MED/{pmid}"
+                    if pmid
+                    else f"https://europepmc.org/article/PMC/{pmcid}"
+                )
+
+            })
+
+        except Exception as error:
+
+            print(
+                "Estudio descartado:",
+                error
+            )
+
+            continue
+
+    print(
+        f"Investigaciones candidatas encontradas: "
+        f"{len(candidates)}"
+    )
+
+    return candidates
+
+
+# ------------------------------------------------------------
+# REDACTAR ARTICULO CON GEMINI
+# ------------------------------------------------------------
+
+def generate_article(study):
+
+    prompt = f"""
+Eres el redactor cientifico de SPORT LAB.
+
+SPORT LAB es una plataforma educativa para estudiantes
+espanoles de Educacion Secundaria Obligatoria (12-16 anos).
+
+Debes redactar un articulo educativo atractivo y riguroso.
+
+REGLAS OBLIGATORIAS:
+
+1. Utiliza exclusivamente los datos del estudio proporcionado.
+2. No inventes autores, resultados, cifras ni conclusiones.
+3. No confundas correlacion con causalidad.
+4. Explica las limitaciones de la investigacion.
+5. Utiliza lenguaje comprensible para adolescentes.
+6. No des consejos medicos individuales.
+7. Si la evidencia no permite una explicacion fiable,
+   devuelve publish=false.
+8. No presentes hipotesis como hechos demostrados.
+
+Devuelve exclusivamente JSON valido.
+
+ESTRUCTURA:
+
+{{
+  "publish": true,
+  "category": "Rendimiento",
+  "icon": "🏃",
+  "type": "Investigacion cientifica",
+  "title": "Pregunta atractiva para adolescentes",
+  "teaser": "Resumen breve y atractivo",
+  "question": "Pregunta principal del articulo",
+  "study": "Que investigaron los cientificos",
+  "method": "Como realizaron la investigacion",
+  "results": "Resultados que encontraron",
+  "explained": "Explicacion sencilla para ESO",
+  "limits": "Limitaciones del estudio",
+  "takeaway": "Idea cientifica principal",
+  "read_minutes": 5,
+  "quiz": [
+    {{
+      "q": "Pregunta de comprension",
+      "options": ["Opcion A", "Opcion B", "Opcion C"],
+      "correct": 0,
+      "explanation": "Explicacion de la respuesta"
+    }}
+  ]
+}}
+
+REQUISITOS DEL CUESTIONARIO:
+
+- Exactamente cinco preguntas.
+- Tres opciones por pregunta.
+- Una sola respuesta correcta.
+- Preguntas basadas en el estudio.
+- Explicaciones claras.
+
+CATEGORIAS PERMITIDAS:
+
+{", ".join(CATEGORIES)}
+
+REFERENCIA ORIGINAL:
+
+Titulo: {study["title"]}
+Autores: {study["authors"]}
+Revista: {study["journal"]}
+Ano: {study["year"]}
+DOI: {study["doi"]}
+PMID: {study["pmid"]}
+
+RESUMEN CIENTIFICO:
+
+{study["abstract"]}
+
+TEXTO COMPLETO DISPONIBLE:
+
+{study["full_text"][:16000]}
+"""
+
+    payload = {
+
+        "contents": [{
+            "parts": [{
+                "text": prompt
+            }]
+        }],
+
+        "generationConfig": {
+
+            "temperature": 0.2,
+
+            "responseMimeType": "application/json"
+
+        }
+
+    }
+
+    url = (
+        "https://generativelanguage.googleapis.com/"
+        f"v1beta/models/{GEMINI_MODEL}:generateContent?"
+        + urllib.parse.urlencode({
+            "key": GEMINI_API_KEY
+        })
+    )
+
+    request = urllib.request.Request(
+
+        url,
+
+        data=json.dumps(payload).encode("utf-8"),
+
+        headers={
+            "Content-Type": "application/json"
+        },
+
+        method="POST"
+
+    )
+
+    try:
+
+        with urllib.request.urlopen(
+            request,
+            timeout=120
+        ) as response:
+
+            result = json.loads(
+                response.read().decode("utf-8")
+            )
+
+    except urllib.error.HTTPError as error:
+
+        detail = error.read().decode(
+            "utf-8",
+            errors="replace"
+        )
+
+        raise RuntimeError(
+            f"Error de Gemini HTTP {error.code}: "
+            f"{detail[:1000]}"
+        )
+
+    text = (
+        result["candidates"][0]
+        ["content"]["parts"][0]["text"]
+    )
+
     return json.loads(text)
 
 
-def validate_article(a):
-    if not isinstance(a, dict) or a.get("publish") is not True:
-        return False, (a or {}).get("reason", "La IA ha indicado que la evidencia no es suficiente.")
-    required = ["category", "icon", "type", "title", "teaser", "question", "study", "method", "results", "explained", "limits", "takeaway", "quiz"]
-    if any(not isinstance(a.get(k), str) or len(a[k].strip()) < 25 for k in required[:-1]):
-        return False, "Faltan secciones o alguna explicación es demasiado breve."
-    if a["category"] not in ALLOWED_CATEGORIES:
-        return False, "Categoría no permitida."
-    quiz = a["quiz"]
-    if not isinstance(quiz, list) or len(quiz) != 5:
-        return False, "El cuestionario no tiene exactamente cinco preguntas."
-    for q in quiz:
-        if not isinstance(q, dict) or not isinstance(q.get("q"), str) or not isinstance(q.get("options"), list) or len(q["options"]) != 3 or not isinstance(q.get("correct"), int) or q["correct"] not in (0, 1, 2) or not isinstance(q.get("explanation"), str):
-            return False, "Formato de pregunta no válido."
-        if any(not isinstance(opt, str) or not opt.strip() for opt in q["options"]):
-            return False, "Hay opciones vacías en el cuestionario."
-    return True, "OK"
+# ------------------------------------------------------------
+# VALIDAR ARTICULO
+# ------------------------------------------------------------
 
+def validate_article(article):
+
+    if not isinstance(article, dict):
+        return False
+
+    if article.get("publish") is not True:
+        return False
+
+    required_fields = [
+
+        "category",
+        "icon",
+        "type",
+        "title",
+        "teaser",
+        "question",
+        "study",
+        "method",
+        "results",
+        "explained",
+        "limits",
+        "takeaway"
+
+    ]
+
+    for field in required_fields:
+
+        value = article.get(field)
+
+        if not isinstance(value, str):
+            return False
+
+        if len(value.strip()) < 20:
+            return False
+
+    if article["category"] not in CATEGORIES:
+        return False
+
+    quiz = article.get("quiz")
+
+    if not isinstance(quiz, list) or len(quiz) != 5:
+        return False
+
+    for question in quiz:
+
+        if not isinstance(question, dict):
+            return False
+
+        if not isinstance(question.get("q"), str):
+            return False
+
+        options = question.get("options")
+
+        if not isinstance(options, list):
+            return False
+
+        if len(options) != 3:
+            return False
+
+        if type(question.get("correct")) is not int:
+            return False
+
+        if question["correct"] not in (0, 1, 2):
+            return False
+
+        if not isinstance(
+            question.get("explanation"), str
+        ):
+            return False
+
+    return True
+
+
+# ------------------------------------------------------------
+# GUARDAR ARTICULO
+# ------------------------------------------------------------
+
+def save_article(data, study, generated):
+
+    today = date.today()
+
+    article = {
+
+        "id": study["id"],
+
+        "category": generated["category"],
+
+        "icon": generated["icon"],
+
+        "type": generated["type"],
+
+        "title": generated["title"],
+
+        "teaser": generated["teaser"],
+
+        "question": generated["question"],
+
+        "study": generated["study"],
+
+        "method": generated["method"],
+
+        "results": generated["results"],
+
+        "explained": generated["explained"],
+
+        "limits": generated["limits"],
+
+        "takeaway": generated["takeaway"],
+
+        "read_minutes": int(
+            generated.get("read_minutes", 5)
+        ),
+
+        "quiz": generated["quiz"],
+
+        "authors": study["authors"],
+
+        "paper_title": study["title"],
+
+        "journal": study["journal"],
+
+        "year": study["year"],
+
+        "doi": study["doi"],
+
+        "pmid": study["pmid"],
+
+        "pmcid": study["pmcid"],
+
+        "url": study["url"],
+
+        "published_at": today.isoformat(),
+
+        "evidence_window_years": 5
+
+    }
+
+    data["articles"].insert(0, article)
+
+    data["updated_at"] = today.isoformat()
+
+    data["automation"] = {
+
+        "source": "Europe PMC",
+
+        "model": GEMINI_MODEL,
+
+        "period": "Ultimos cinco anos"
+
+    }
+
+    ARTICLES_FILE.write_text(
+
+        json.dumps(
+            data,
+            ensure_ascii=False,
+            indent=2
+        ) + "\n",
+
+        encoding="utf-8"
+
+    )
+
+    print(
+        "ARTICULO GUARDADO:",
+        article["title"]
+    )
+
+
+# ------------------------------------------------------------
+# PROCESO PRINCIPAL
+# ------------------------------------------------------------
 
 def main():
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
-    if not api_key:
-        raise RuntimeError("Falta el secreto GEMINI_API_KEY. Añádelo en Settings > Secrets and variables > Actions.")
-    # GitHub cron está en UTC: se invoca a las 06:00 y 07:00 UTC y solo continúa a las 08:xx de Madrid.
-    madrid_now = datetime.now(timezone.utc).astimezone(__import__("zoneinfo").ZoneInfo("Europe/Madrid"))
-    if os.getenv("GITHUB_EVENT_NAME") == "schedule" and madrid_now.hour != 8:
-        print(f"Ejecución descartada: ahora son las {madrid_now:%H:%M} en Madrid; se espera a las 08:00.")
+
+    print("===================================")
+    print("        SPORT LAB AUTOMATICO")
+    print("===================================")
+
+    if not GEMINI_API_KEY:
+
+        raise RuntimeError(
+            "Falta GEMINI_API_KEY. "
+            "Configura el secreto en GitHub Actions."
+        )
+
+    madrid_now = datetime.now(
+        timezone.utc
+    ).astimezone(
+        ZoneInfo("Europe/Madrid")
+    )
+
+    print(
+        "Fecha y hora de Madrid:",
+        madrid_now.isoformat()
+    )
+
+    data = load_articles()
+
+    existing_ids = {
+
+        article.get("id")
+
+        for article in data["articles"]
+
+        if isinstance(article, dict)
+
+    }
+
+    candidates = find_studies(existing_ids)
+
+    if not candidates:
+
+        print(
+            "No se encontraron estudios adecuados. "
+            "No se publicara contenido de relleno."
+        )
+
         return
-    data = json.loads(ARTICLES_FILE.read_text(encoding="utf-8"))
-    existing = data.get("articles", [])
-    existing_ids = {a.get("id") for a in existing}
-    candidates = europe_pmc_candidates(existing_ids)
-    print(f"Europe PMC: {len(candidates)} estudios recientes con texto completo localizados.")
-    for candidate in candidates[:6]:
+
+    for study in candidates[:5]:
+
         try:
-            generated = call_gemini(candidate, api_key)
-            ok, reason = validate_article(generated)
-            if not ok:
-                print(f"Descartado {candidate['id']}: {reason}")
+
+            print(
+                "Analizando:",
+                study["title"]
+            )
+
+            generated = generate_article(study)
+
+            if not validate_article(generated):
+
+                print(
+                    "Articulo descartado por validacion."
+                )
+
                 continue
-            year = int(candidate["year"])
-            if year < date.today().year - 5 or year > date.today().year:
-                print(f"Descartado {candidate['id']}: fuera de la ventana de cinco años.")
-                continue
-            slug = candidate["id"]
-            article = {k: generated[k] for k in ["category", "icon", "type", "title", "teaser", "question", "study", "method", "results", "explained", "limits", "takeaway", "quiz"]}
-            article.update({
-                "id": slug, "year": str(year), "read_minutes": int(generated.get("read_minutes", 5)),
-                "authors": candidate["authors"], "paper_title": candidate["title"],
-                "journal": candidate["journal"],
-                "identifier": " · ".join(x for x in [f"DOI: {candidate['doi']}" if candidate["doi"] else "", f"PMID: {candidate['pmid']}" if candidate["pmid"] else "", f"PMCID: {candidate['pmcid']}"] if x),
-                "url": candidate["source_url"], "published_at": date.today().isoformat(), "evidence_window_years": 5
-            })
-            existing.insert(0, article)
-            data["articles"] = existing
-            data["updated_at"] = date.today().isoformat()
-            data["automation"] = {"source": "Europe PMC", "model": MODEL, "policy": "Estudios publicados en los últimos cinco años; texto completo OA; sin aprobación manual."}
-            ARTICLES_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-            print(f"PUBLICADO: {article['title']} ({year}) — {candidate['source_url']}")
+
+            save_article(
+                data,
+                study,
+                generated
+            )
+
+            print(
+                "PUBLICACION COMPLETADA CORRECTAMENTE."
+            )
+
             return
-        except Exception as exc:
-            print(f"Error procesando {candidate['id']}: {exc}")
-            time.sleep(2)
-    print("No se ha encontrado un estudio apto entre los candidatos revisados. Se mantiene la biblioteca actual; no se publica contenido de relleno.")
+
+        except Exception as error:
+
+            print(
+                "Error procesando estudio:",
+                error
+            )
+
+            continue
+
+    print(
+        "No se pudo generar un articulo que "
+        "superara las comprobaciones."
+    )
 
 
 if __name__ == "__main__":
