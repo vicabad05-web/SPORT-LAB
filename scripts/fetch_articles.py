@@ -2,19 +2,26 @@
 import os
 import json
 import time
+import random
 import re
 import urllib.request
 import urllib.parse
+import urllib.error
 import xml.etree.ElementTree as ET
 from datetime import date, timedelta
 from pathlib import Path
 
 # =====================================================
-# CONFIGURACION GENERAL
+# 1. CONFIGURACION
 # =====================================================
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-3.5-flash-lite"
+
+GEMINI_MODELS = [
+    "gemini-3.5-flash-lite",
+    "gemini-3.5-flash",
+    "gemini-3.8-flash"
+]
 
 DATA_FILE = Path("data/articles.json")
 MAX_ARTICLES_PER_RUN = 1
@@ -27,11 +34,10 @@ USER_AGENT = "SPORT-LAB-Educational-Project/1.0"
 
 
 # =====================================================
-# PETICIONES HTTP
+# 2. PETICIONES HTTP
 # =====================================================
 
-def http_request(url, data=None, timeout=60, attempts=3,
-                 content_type=None):
+def http_request(url, data=None, timeout=90, content_type=None):
 
     headers = {"User-Agent": USER_AGENT}
 
@@ -40,38 +46,62 @@ def http_request(url, data=None, timeout=60, attempts=3,
             content_type or "application/x-www-form-urlencoded"
         )
 
-    last_error = None
+    request = urllib.request.Request(
+        url,
+        data=data,
+        headers=headers
+    )
+
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return response.read().decode("utf-8")
+
+
+def get_with_retries(url, data=None, timeout=90,
+                     content_type=None, attempts=4):
+
+    transient_codes = [408, 429, 500, 502, 503, 504]
 
     for attempt in range(attempts):
         try:
-            request = urllib.request.Request(
+            return http_request(
                 url,
                 data=data,
-                headers=headers
+                timeout=timeout,
+                content_type=content_type
             )
 
-            with urllib.request.urlopen(
-                request,
-                timeout=timeout
-            ) as response:
-                return response.read().decode("utf-8")
+        except urllib.error.HTTPError as error:
+
+            print(f"Error HTTP {error.code}: {error.reason}")
+
+            if error.code not in transient_codes:
+                raise
+
+            if attempt == attempts - 1:
+                raise
+
+            wait = min(5 * (2 ** attempt), 60)
+            wait += random.uniform(0, 3)
+
+            print(f"Servicio ocupado. Esperando {wait:.1f} segundos...")
+            time.sleep(wait)
 
         except Exception as error:
-            last_error = error
-            print(
-                f"Intento {attempt + 1}/{attempts} fallido: {error}"
-            )
 
-            if attempt < attempts - 1:
-                time.sleep(3 * (attempt + 1))
+            if attempt == attempts - 1:
+                raise
 
-    raise RuntimeError(
-        f"No se pudo completar la petición: {last_error}"
-    )
+            wait = min(5 * (2 ** attempt), 60)
+
+            print(f"Error de conexión: {error}")
+            print(f"Nuevo intento en {wait} segundos...")
+            time.sleep(wait)
+
+    raise RuntimeError("Se agotaron los intentos de conexión.")
 
 
 # =====================================================
-# FECHAS Y ARTICULOS EXISTENTES
+# 3. FECHAS Y ARTICULOS EXISTENTES
 # =====================================================
 
 def get_date_range():
@@ -81,6 +111,7 @@ def get_date_range():
 
 
 def load_existing_articles():
+
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     if not DATA_FILE.exists():
@@ -101,6 +132,7 @@ def load_existing_articles():
 
 
 def get_existing_ids(articles):
+
     identifiers = set()
 
     for article in articles:
@@ -114,10 +146,11 @@ def get_existing_ids(articles):
 
 
 # =====================================================
-# BUSQUEDA EN PUBMED
+# 4. BUSQUEDA EN PUBMED
 # =====================================================
 
 def search_pubmed(existing_ids):
+
     print("Buscando investigaciones en PubMed...")
 
     start_date, end_date = get_date_range()
@@ -141,7 +174,7 @@ def search_pubmed(existing_ids):
 
     url = PUBMED_BASE + "esearch.fcgi?" + urllib.parse.urlencode(params)
 
-    response = http_request(url)
+    response = get_with_retries(url)
     data = json.loads(response)
 
     pmids = data.get("esearchresult", {}).get("idlist", [])
@@ -160,12 +193,13 @@ def search_pubmed(existing_ids):
         fetch_params
     )
 
-    xml_data = http_request(fetch_url)
+    xml_data = get_with_retries(fetch_url)
     root = ET.fromstring(xml_data)
 
     candidates = []
 
     for item in root.findall(".//PubmedArticle"):
+
         pmid = item.findtext(".//PMID")
 
         if not pmid or pmid.lower() in existing_ids:
@@ -216,14 +250,16 @@ def search_pubmed(existing_ids):
         })
 
     print(f"PubMed: {len(candidates)} estudios encontrados.")
+
     return candidates
 
 
 # =====================================================
-# BUSQUEDA EN EUROPE PMC
+# 5. BUSQUEDA EN EUROPE PMC
 # =====================================================
 
 def search_europe_pmc(existing_ids):
+
     print("Buscando investigaciones en Europe PMC...")
 
     start_date, end_date = get_date_range()
@@ -246,12 +282,13 @@ def search_europe_pmc(existing_ids):
 
     url = EUROPE_PMC_BASE + "search?" + urllib.parse.urlencode(params)
 
-    response = http_request(url)
+    response = get_with_retries(url)
     data = json.loads(response)
 
     candidates = []
 
     for item in data.get("resultList", {}).get("result", []):
+
         pmid = item.get("pmid", "")
         doi = item.get("doi", "")
         title = item.get("title", "")
@@ -292,23 +329,27 @@ def search_europe_pmc(existing_ids):
         })
 
     print(f"Europe PMC: {len(candidates)} estudios encontrados.")
+
     return candidates
 
 
 # =====================================================
-# BUSQUEDA COMBINADA
+# 6. BUSQUEDA COMBINADA
 # =====================================================
 
 def find_studies(existing_ids):
+
     candidates = []
 
     try:
         candidates.extend(search_pubmed(existing_ids))
+
     except Exception as error:
         print(f"AVISO: PubMed no disponible: {error}")
 
     try:
         candidates.extend(search_europe_pmc(existing_ids))
+
     except Exception as error:
         print(f"AVISO: Europe PMC no disponible: {error}")
 
@@ -316,6 +357,7 @@ def find_studies(existing_ids):
     seen = set()
 
     for item in candidates:
+
         identifier = (
             item.get("doi")
             or item.get("pmid")
@@ -334,16 +376,12 @@ def find_studies(existing_ids):
 
 
 # =====================================================
-# GENERACION DEL ARTICULO CON GEMINI
+# 7. PROMPT EDUCATIVO
 # =====================================================
 
-def generate_article(study):
-    if not GEMINI_API_KEY:
-        raise RuntimeError("Falta el secreto GEMINI_API_KEY.")
+def build_prompt(study):
 
-    print("Generando artículo educativo con Gemini...")
-
-    prompt = f"""
+    return f"""
 Eres el redactor científico de SPORT LAB, una plataforma
 educativa de ciencias del deporte para estudiantes de ESO
 de entre 12 y 16 años.
@@ -371,7 +409,7 @@ REGLAS:
 - El artículo debe ser claro, atractivo y didáctico.
 - Incluye exactamente 5 preguntas tipo test.
 - Cada pregunta debe tener 4 opciones.
-- La respuesta correcta se indica mediante un número
+- La respuesta correcta debe indicarse mediante un número
   de opción empezando por 0.
 
 Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
@@ -410,9 +448,18 @@ Entrenamiento, Salud, Nutrición, Cerebro, Fisiología,
 Biomecánica o Psicología deportiva.
 """
 
+
+# =====================================================
+# 8. GENERACION CON MODELOS ALTERNATIVOS
+# =====================================================
+
+def generate_with_model(study, model):
+
+    prompt = build_prompt(study)
+
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{GEMINI_MODEL}:generateContent?"
+        f"{model}:generateContent?"
         f"key={urllib.parse.quote(GEMINI_API_KEY)}"
     )
 
@@ -430,12 +477,12 @@ Biomecánica o Psicología deportiva.
         }
     }
 
-    response = http_request(
+    response = get_with_retries(
         url,
         data=json.dumps(body).encode("utf-8"),
-        timeout=120,
-        attempts=3,
-        content_type="application/json"
+        timeout=180,
+        content_type="application/json",
+        attempts=4
     )
 
     result = json.loads(response)
@@ -447,7 +494,10 @@ Biomecánica o Psicología deportiva.
     text = re.sub(r"^```(?:json)?\s*", "", text.strip())
     text = re.sub(r"\s*```$", "", text)
 
-    article = json.loads(text)
+    return json.loads(text)
+
+
+def validate_article(article):
 
     required_fields = [
         "category", "icon", "type", "title", "teaser",
@@ -459,10 +509,14 @@ Biomecánica o Psicología deportiva.
         if field not in article:
             raise ValueError(f"Falta el campo: {field}")
 
+        if article[field] is None:
+            raise ValueError(f"Campo vacío: {field}")
+
     if len(article["quiz"]) != 5:
         raise ValueError("El artículo debe tener 5 preguntas.")
 
     for question in article["quiz"]:
+
         if (
             len(question.get("options", [])) != 4
             or question.get("correct") not in [0, 1, 2, 3]
@@ -472,12 +526,39 @@ Biomecánica o Psicología deportiva.
     return article
 
 
+def generate_article(study):
+
+    if not GEMINI_API_KEY:
+        raise RuntimeError("Falta el secreto GEMINI_API_KEY.")
+
+    for model in GEMINI_MODELS:
+
+        print(f"Probando modelo Gemini: {model}")
+
+        try:
+            article = generate_with_model(study, model)
+            article = validate_article(article)
+
+            article["ai_model"] = model
+
+            print(f"Artículo generado con {model}")
+
+            return article
+
+        except Exception as error:
+            print(f"Fallo en {model}: {error}")
+            print("Se probará el siguiente modelo si está disponible.")
+
+    raise RuntimeError(
+        "Ninguno de los modelos Gemini ha podido generar el artículo."
+    )
+
+
 # =====================================================
-# GUARDAR ARTICULO
+# 9. GUARDAR ARTICULO
 # =====================================================
 
 def save_article(article, study, existing_data):
-    today = date.today().isoformat()
 
     article["id"] = (
         study.get("pmid")
@@ -493,7 +574,7 @@ def save_article(article, study, existing_data):
     article["pmid"] = study["pmid"]
     article["url"] = study["url"]
     article["source"] = study["source"]
-    article["published_at"] = today
+    article["published_at"] = date.today().isoformat()
     article["evidence_window_years"] = YEARS_BACK
 
     existing_data["articles"].insert(0, article)
@@ -511,16 +592,17 @@ def save_article(article, study, existing_data):
 
 
 # =====================================================
-# PROGRAMA PRINCIPAL
+# 10. PROGRAMA PRINCIPAL
 # =====================================================
 
 def main():
-    print("===================================")
-    print("       SPORT LAB AUTOMATICO")
-    print("===================================")
+
+    print("======================================")
+    print("          SPORT LAB AUTOMATICO")
+    print("======================================")
 
     print(f"Fecha: {date.today().isoformat()}")
-    print(f"Modelo Gemini: {GEMINI_MODEL}")
+    print("Modelos disponibles:", ", ".join(GEMINI_MODELS))
 
     existing_data = load_existing_articles()
 
@@ -536,11 +618,18 @@ def main():
 
     published = 0
 
-    for study in candidates:
-        if published >= MAX_ARTICLES_PER_RUN:
-            break
+    # Se prueba un estudio por ejecución.
+    # Si falla Gemini, no se marca como publicado.
+    # El estudio seguirá disponible en la siguiente ejecución.
+
+    for study in candidates[:MAX_ARTICLES_PER_RUN]:
+
+        print("--------------------------------------")
+        print("Estudio seleccionado:")
+        print(study["title"])
 
         try:
+
             article = generate_article(study)
 
             save_article(
@@ -550,17 +639,18 @@ def main():
             )
 
             published += 1
-            break
 
         except Exception as error:
-            print(
-                f"No se pudo generar el artículo "
-                f"'{study.get('title', '')}': {error}"
-            )
+
+            print(f"Error generando el artículo: {error}")
+            print("El estudio no se marcará como publicado.")
+            print("Se podrá volver a intentar en otra ejecución.")
 
     if published == 0:
         print("No se ha podido publicar ningún artículo.")
 
+    print("--------------------------------------")
+    print(f"Artículos publicados en esta ejecución: {published}")
     print("Proceso SPORT LAB finalizado.")
 
 
