@@ -9,7 +9,7 @@
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap nav"><div class="brand"><div class="brandmark">✳</div><div>SPORT LAB<small>SCIENCE · SPORT · HUMAN BODY</small></div></div><nav class="navlinks"><button class="active" data-nav="home">INICIO</button><button data-nav="library">LABORATORIO</button><button data-nav="progress">MI PROGRESO</button></nav><div class="profile"><div class="avatar">⚡</div><span class="pname">EXPLORADOR</span><span class="level" id="navLevel">NV. 1</span></div></div></header>
+<header class="top"><div class="wrap nav"><div class="brand"><div class="brandmark">✳</div><div>SPORT LAB<small>SCIENCE · SPORT · HUMAN BODY</small></div></div><nav class="navlinks"><button class="active" data-nav="home">INICIO</button><button data-nav="library">LABORATORIO</button><button data-nav="progress">MI PROGRESO</button></nav><button class="profile" id="accountButton" type="button" onclick="startAnonymousSession()"><div class="avatar">⚡</div><span class="pname" id="accountName">ENTRAR</span><span class="level" id="navLevel">NV. 1</span></button></div></header>
 <main class="wrap">
 <section id="home" class="view active">
 <div class="hero"><div><div class="eyebrow">// BIENVENIDO A TU NUEVO LABORATORIO</div><h1>LA CIENCIA<br>ESTÁ EN <span>TU CUERPO.</span></h1><p>¿Puede el ejercicio ayudarte a pensar mejor? ¿Por qué late más rápido tu corazón? ¿Qué ocurre mientras duermes? Descubre las respuestas detrás de la ciencia del deporte.</p><div class="hero-actions"><button class="primary" onclick="showView('library')">EXPLORAR INVESTIGACIONES ↗</button><button class="secondary" onclick="showView('progress')">VER MI PROGRESO</button></div></div><div class="hero-card"><div class="orbit"><span>🧬</span></div><h3>ACTIVA TU CURIOSIDAD</h3><p>Investiga. Responde. Consigue XP. Sube de nivel.</p></div></div>
@@ -18,11 +18,44 @@
 <div class="sectionhead"><div><div class="eyebrow">// TU SIGUIENTE MISIÓN</div><h2>El conocimiento se entrena</h2></div></div><div class="mission"><div class="missionbox"><div class="eyebrow">MISIÓN SEMANAL</div><h3>Completa una investigación</h3><p>Lee un artículo y responde su desafío científico para conseguir experiencia.</p><div class="progress"><i id="missionBar"></i></div><small id="missionText" style="color:var(--muted)">0 de 1 investigaciones completadas</small></div><div class="missionbox"><div class="eyebrow">RECOMPENSA</div><h3>🏅 Explorador científico</h3><p>Consigue tu primera insignia al completar un cuestionario.</p><strong style="color:var(--lime)">+100 XP</strong></div></div>
 </section>
 <section id="library" class="view"><div class="sectionhead" style="margin-top:45px"><div><div class="eyebrow">// BASE DE CONOCIMIENTO</div><h2>Laboratorio de investigaciones</h2><p>Artículos explicados a partir de publicaciones científicas.</p></div></div><div class="filters" id="filters"><button class="chip active" data-filter="Todas">TODAS</button><button class="chip" data-filter="Cerebro">🧠 CEREBRO</button><button class="chip" data-filter="Rendimiento">💪 RENDIMIENTO</button><button class="chip" data-filter="Cuerpo humano">🫀 CUERPO HUMANO</button></div><div id="libraryCards" class="articles"></div></section>
-<section id="progress" class="view"><div class="sectionhead" style="margin-top:45px"><div><div class="eyebrow">// IDENTIDAD DEL INVESTIGADOR</div><h2>Tu progreso</h2><p>Tu experiencia se guarda en este dispositivo y navegador.</p></div></div><div class="mission"><div class="missionbox"><div class="eyebrow">NIVEL ACTUAL</div><h3 id="bigLevel" style="font-size:38px;color:var(--lime)">NV. 1</h3><p id="levelName">Novato científico</p><div class="progress"><i id="levelBar"></i></div><small id="levelProgress" style="color:var(--muted)">0 / 250 XP para el siguiente nivel</small></div><div class="missionbox"><div class="eyebrow">EXPERIENCIA TOTAL</div><h3 id="bigXp" style="font-size:38px;color:var(--lime)">0 XP</h3><p>Gana 100 XP por cada cuestionario completado por primera vez.</p></div></div><div class="sectionhead"><div><div class="eyebrow">// LOGROS DESBLOQUEABLES</div><h2>Tus insignias</h2></div></div><div id="badges" class="articles"></div><p style="color:var(--muted);font-size:12px;margin:20px 0 60px">Nota: el progreso se almacena localmente. No existe clasificación pública ni se recogen nombres de alumnos.</p></section>
+<section id="progress" class="view"><div class="sectionhead" style="margin-top:45px"><div><div class="eyebrow">// IDENTIDAD DEL INVESTIGADOR</div><h2>Tu progreso</h2><p>Tu experiencia se guarda en este dispositivo y navegador.</p></div></div><div class="mission"><div class="missionbox"><div class="eyebrow">NIVEL ACTUAL</div><h3 id="bigLevel" style="font-size:38px;color:var(--lime)">NV. 1</h3><p id="levelName">Novato científico</p><div class="progress"><i id="levelBar"></i></div><small id="levelProgress" style="color:var(--muted)">0 / 250 XP para el siguiente nivel</small></div><div class="missionbox"><div class="eyebrow">EXPERIENCIA TOTAL</div><h3 id="bigXp" style="font-size:38px;color:var(--lime)">0 XP</h3><p>Gana 100 XP por cada cuestionario completado por primera vez.</p></div></div><div class="sectionhead"><div><div class="eyebrow">// LOGROS DESBLOQUEABLES</div><h2>Tus insignias</h2></div></div><div id="badges" class="articles"></div><p id="accountNotice" style="color:var(--muted);font-size:12px;margin:20px 0 60px">Acceso anónimo: pulsa ENTRAR para crear un perfil con alias automático. No introduzcas datos personales. El progreso compartido se conectará en una fase posterior.</p></section>
 <section id="articleView" class="view"><div class="article-view"><button class="back" onclick="showView('library')">← VOLVER AL LABORATORIO</button><div id="articleDetail"></div></div></section>
 </main>
 <footer class="footer"><div class="wrap"><strong>SPORT LAB</strong> · Ciencia que se juega.<br>Proyecto educativo de divulgación científica. Los contenidos son adaptaciones didácticas, no consejos médicos. Consulta siempre la publicación original y ten en cuenta sus limitaciones.</div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL='https://qxoqygypmnrbzakpiylq.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_j12SLqB0ApdJMsUEfG-Yow_qcCc1VOk';
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let currentProfile=null;
+async function startAnonymousSession(){
+ const button=document.getElementById('accountButton');
+ const name=document.getElementById('accountName');
+ const notice=document.getElementById('accountNotice');
+ button.disabled=true;
+ name.textContent='CONECTANDO...';
+ try{
+  const sessionResult=await supabaseClient.auth.getSession();
+  if(sessionResult.error) throw sessionResult.error;
+  let session=sessionResult.data.session;
+  if(!session){
+   const signInResult=await supabaseClient.auth.signInAnonymously();
+   if(signInResult.error) throw signInResult.error;
+   session=signInResult.data.session;
+  }
+  const profileResult=await supabaseClient.from('profiles').select('alias,xp').eq('id',session.user.id).single();
+  if(profileResult.error) throw profileResult.error;
+  currentProfile=profileResult.data;
+  name.textContent=currentProfile.alias;
+  notice.textContent='Sesión anónima activa como '+currentProfile.alias+'. No se ha solicitado correo, nombre ni contraseña. El progreso compartido y el ranking se habilitarán tras configurar su validación segura.';
+ }catch(error){
+  console.error('SPORT LAB auth:',error);
+  name.textContent='REINTENTAR';
+  notice.textContent='No se ha podido iniciar la sesión anónima. Comprueba la conexión e inténtalo de nuevo.';
+ }finally{
+  button.disabled=false;
+ }
+}
 let ARTICLES=[];let activeFilter='Todas';let state=loadState();
 function loadState(){try{return JSON.parse(localStorage.getItem('sportlab-progress'))||{xp:0,done:[]}}catch(e){return{xp:0,done:[]}}}
 function saveState(){localStorage.setItem('sportlab-progress',JSON.stringify(state));updateProgress()}
