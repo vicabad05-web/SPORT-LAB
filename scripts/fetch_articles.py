@@ -156,8 +156,10 @@ def search_pubmed(existing_ids):
     start_date, end_date = get_date_range()
 
     search_terms = (
-        '(exercise OR sport OR "physical activity" '
-        'OR training OR sports science)'
+        '("Exercise"[MeSH Terms] OR "Sports"[MeSH Terms] '
+        'OR "Motor Activity"[MeSH Terms] OR exercise[Title/Abstract] '
+        'OR sport[Title/Abstract] OR "physical activity"[Title/Abstract] '
+        'OR training[Title/Abstract])'
         ' AND humans[MeSH Terms]'
     )
 
@@ -376,81 +378,114 @@ def find_studies(existing_ids):
 
 
 # =====================================================
-# 7. PROMPT EDUCATIVO
+# 7. FILTRO CIENTIFICO Y PROMPT EDUCATIVO
 # =====================================================
+
+SCIENTIFIC_THRESHOLD = 70
+MAX_CANDIDATES_TO_SCREEN = 5
 
 def build_prompt(study):
 
     return f"""
-Eres el redactor científico de SPORT LAB, una plataforma
-educativa de ciencias del deporte para estudiantes de ESO
+Eres el equipo de evaluación científica y redacción de SPORT LAB,
+una plataforma educativa de ciencias del deporte para alumnado de ESO
 de entre 12 y 16 años.
 
-Transforma el siguiente estudio científico en un artículo
-educativo riguroso, atractivo y fácil de entender.
+Tu tarea tiene DOS FASES:
+1) Evaluar la calidad y relevancia científica del estudio.
+2) Si obtiene 70 puntos o más sobre 100, redactar el artículo educativo.
 
 ESTUDIO ORIGINAL:
-
 Título: {study['title']}
 Revista: {study['journal']}
 Año: {study['year']}
+Fuente: {study['source']}
 Resumen: {study['abstract']}
 
-REGLAS:
+FASE 1. EVALUACIÓN CIENTÍFICA (0-100):
+Puntúa con criterios explícitos:
+- Relevancia para ciencias del deporte, actividad física, ejercicio,
+  salud, nutrición, fisiología, biomecánica, cerebro o psicología deportiva: 0-30.
+- Calidad y adecuación del diseño metodológico: 0-25.
+- Solidez del análisis, resultados y conclusiones: 0-20.
+- Calidad de la muestra, datos o fuentes utilizadas: 0-15.
+- Transparencia, reconocimiento de limitaciones y riesgo de sesgo: 0-10.
 
-- No inventes resultados ni conclusiones.
-- No inventes cifras.
-- Explica los conceptos para estudiantes de 12 a 16 años.
+La suma debe ser exactamente 100 puntos como máximo.
+No penalices automáticamente un estudio por ser observacional, cualitativo,
+transversal, longitudinal, ensayo clínico, revisión sistemática o metaanálisis.
+Valora cada diseño según lo que puede demostrar y la calidad con que se realizó.
+Incluye todos los diseños relevantes: ensayos, estudios observacionales,
+cohortes, casos y controles, estudios transversales, cualitativos,
+revisiones sistemáticas y metaanálisis.
+No confundas el tipo de estudio con su calidad. No otorgues una puntuación alta
+solo por aparecer en una revista conocida.
+Si el resumen no aporta información suficiente para evaluar un criterio,
+no inventes datos y asigna una puntuación prudente.
+
+Identifica el diseño del estudio y explica brevemente la puntuación.
+Si la puntuación total es inferior a {SCIENTIFIC_THRESHOLD}, devuelve
+"article": null. No redactes un artículo para ese estudio.
+
+FASE 2. ARTÍCULO:
+Solo si la puntuación es igual o superior a {SCIENTIFIC_THRESHOLD},
+redacta un artículo educativo riguroso, atractivo y comprensible para ESO.
+
+REGLAS DEL ARTÍCULO:
+- No inventes resultados, cifras, autores ni conclusiones.
+- Usa únicamente la información del estudio proporcionado.
 - Diferencia resultados de interpretaciones.
 - Explica las limitaciones del estudio.
 - No presentes correlaciones como causalidad.
 - No des consejos médicos individuales.
 - Escribe en español de España.
-- El artículo debe ser claro, atractivo y didáctico.
-- Incluye exactamente 5 preguntas tipo test.
-- Cada pregunta debe tener 4 opciones.
-- La respuesta correcta debe indicarse mediante un número
-  de opción empezando por 0.
+- Incluye exactamente 5 preguntas tipo test, con 4 opciones cada una.
+- "correct" debe ser el índice de la respuesta correcta: 0, 1, 2 o 3.
+- La categoría debe ser una de estas: Entrenamiento, Salud, Nutrición,
+  Cerebro, Fisiología, Biomecánica o Psicología deportiva.
 
-Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
-
+Devuelve EXCLUSIVAMENTE JSON válido con esta estructura:
 {{
-  "category": "Entrenamiento",
-  "icon": "🏃",
-  "type": "Investigación",
-  "title": "Título atractivo en español",
-  "teaser": "Resumen breve que despierte curiosidad",
-  "question": "Pregunta inicial para el estudiante",
-  "study": "Qué investigaron los científicos",
-  "method": "Cómo realizaron el estudio",
-  "results": "Qué encontraron",
-  "explained": "Explicación científica adaptada a ESO",
-  "limits": "Limitaciones del estudio",
-  "takeaway": "Idea principal que debe recordar el alumno",
-  "read_minutes": 5,
-  "quiz": [
-    {{
-      "question": "Pregunta",
-      "options": [
-        "Opción A",
-        "Opción B",
-        "Opción C",
-        "Opción D"
-      ],
-      "correct": 0,
-      "explanation": "Explicación de la respuesta"
-    }}
-  ]
+  "scientific_score": 0,
+  "score_breakdown": {{
+    "relevance": 0,
+    "methodology": 0,
+    "analysis": 0,
+    "sample_or_sources": 0,
+    "transparency": 0
+  }},
+  "study_design": "Tipo de diseño",
+  "scientific_reason": "Justificación breve de la puntuación",
+  "article": {{
+    "category": "Entrenamiento",
+    "icon": "🏃",
+    "type": "Investigación",
+    "title": "Título atractivo en español",
+    "teaser": "Resumen breve que despierte curiosidad",
+    "question": "Pregunta inicial para el estudiante",
+    "study": "Qué investigaron los científicos",
+    "method": "Cómo realizaron el estudio",
+    "results": "Qué encontraron",
+    "explained": "Explicación científica adaptada a ESO",
+    "limits": "Limitaciones del estudio",
+    "takeaway": "Idea principal que debe recordar el alumno",
+    "read_minutes": 5,
+    "quiz": [
+      {{
+        "question": "Pregunta",
+        "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
+        "correct": 0,
+        "explanation": "Explicación de la respuesta"
+      }}
+    ]
+  }}
 }}
-
-La categoría debe ser una de estas:
-Entrenamiento, Salud, Nutrición, Cerebro, Fisiología,
-Biomecánica o Psicología deportiva.
+Si scientific_score es inferior a {SCIENTIFIC_THRESHOLD}, article debe ser null.
 """
 
 
 # =====================================================
-# 8. GENERACION CON MODELOS ALTERNATIVOS
+# 8. EVALUACION Y GENERACION CON GEMINI
 # =====================================================
 
 def generate_with_model(study, model):
@@ -472,7 +507,7 @@ def generate_with_model(study, model):
             }
         ],
         "generationConfig": {
-            "temperature": 0.4,
+            "temperature": 0.2,
             "responseMimeType": "application/json"
         }
     }
@@ -486,15 +521,41 @@ def generate_with_model(study, model):
     )
 
     result = json.loads(response)
-
-    text = (
-        result["candidates"][0]["content"]["parts"][0]["text"]
-    )
-
+    text = result["candidates"][0]["content"]["parts"][0]["text"]
     text = re.sub(r"^```(?:json)?\s*", "", text.strip())
     text = re.sub(r"\s*```$", "", text)
 
     return json.loads(text)
+
+
+def validate_scientific_evaluation(evaluation):
+
+    score = evaluation.get("scientific_score")
+
+    if not isinstance(score, (int, float)) or not 0 <= score <= 100:
+        raise ValueError("La puntuación científica no es válida.")
+
+    breakdown = evaluation.get("score_breakdown", {})
+    score_fields = [
+        "relevance", "methodology", "analysis",
+        "sample_or_sources", "transparency"
+    ]
+
+    if not all(field in breakdown for field in score_fields):
+        raise ValueError("Falta el desglose de la puntuación científica.")
+
+    if sum(breakdown[field] for field in score_fields) != score:
+        raise ValueError("El desglose no coincide con la puntuación total.")
+
+    if score >= SCIENTIFIC_THRESHOLD:
+        article = evaluation.get("article")
+        if not isinstance(article, dict):
+            raise ValueError("El estudio supera el filtro, pero no hay artículo.")
+        validate_article(article)
+    elif evaluation.get("article") is not None:
+        raise ValueError("Un estudio por debajo del umbral no debe generar artículo.")
+
+    return evaluation
 
 
 def validate_article(article):
@@ -506,17 +567,13 @@ def validate_article(article):
     ]
 
     for field in required_fields:
-        if field not in article:
-            raise ValueError(f"Falta el campo: {field}")
+        if field not in article or article[field] is None:
+            raise ValueError(f"Falta el campo obligatorio: {field}")
 
-        if article[field] is None:
-            raise ValueError(f"Campo vacío: {field}")
-
-    if len(article["quiz"]) != 5:
-        raise ValueError("El artículo debe tener 5 preguntas.")
+    if not isinstance(article["quiz"], list) or len(article["quiz"]) != 5:
+        raise ValueError("El artículo debe tener exactamente 5 preguntas.")
 
     for question in article["quiz"]:
-
         if (
             len(question.get("options", [])) != 4
             or question.get("correct") not in [0, 1, 2, 3]
@@ -526,31 +583,54 @@ def validate_article(article):
     return article
 
 
-def generate_article(study):
+def evaluate_and_generate(study):
 
     if not GEMINI_API_KEY:
         raise RuntimeError("Falta el secreto GEMINI_API_KEY.")
 
-    for model in GEMINI_MODELS:
+    last_error = None
 
-        print(f"Probando modelo Gemini: {model}")
+    for model in GEMINI_MODELS:
+        print(f"Evaluando estudio con Gemini: {model}")
 
         try:
-            article = generate_with_model(study, model)
-            article = validate_article(article)
+            evaluation = generate_with_model(study, model)
+            evaluation = validate_scientific_evaluation(evaluation)
 
+            score = int(evaluation["scientific_score"])
+            print(f"Puntuación científica: {score}/100")
+            print(f"Diseño: {evaluation.get('study_design', 'No especificado')}")
+            print(f"Justificación: {evaluation.get('scientific_reason', '')}")
+
+            if score < SCIENTIFIC_THRESHOLD:
+                print(
+                    f"Estudio descartado: no alcanza el umbral "
+                    f"de {SCIENTIFIC_THRESHOLD}/100."
+                )
+                return None
+
+            article = evaluation["article"]
+            article["scientific_score"] = score
+            article["scientific_threshold"] = SCIENTIFIC_THRESHOLD
+            article["scientific_score_breakdown"] = evaluation["score_breakdown"]
+            article["study_design"] = evaluation.get(
+                "study_design", "No especificado"
+            )
+            article["scientific_reason"] = evaluation.get(
+                "scientific_reason", ""
+            )
             article["ai_model"] = model
 
-            print(f"Artículo generado con {model}")
-
+            print(f"Estudio aceptado y artículo generado con {model}.")
             return article
 
         except Exception as error:
+            last_error = error
             print(f"Fallo en {model}: {error}")
             print("Se probará el siguiente modelo si está disponible.")
 
     raise RuntimeError(
-        "Ninguno de los modelos Gemini ha podido generar el artículo."
+        f"No se pudo evaluar y generar el artículo con Gemini: {last_error}"
     )
 
 
@@ -576,6 +656,7 @@ def save_article(article, study, existing_data):
     article["source"] = study["source"]
     article["published_at"] = date.today().isoformat()
     article["evidence_window_years"] = YEARS_BACK
+    article["scientific_threshold"] = SCIENTIFIC_THRESHOLD
 
     existing_data["articles"].insert(0, article)
 
@@ -602,14 +683,14 @@ def main():
     print("======================================")
 
     print(f"Fecha: {date.today().isoformat()}")
+    print(f"Filtro científico: mínimo {SCIENTIFIC_THRESHOLD}/100")
+    print(f"Ventana de búsqueda: últimos {YEARS_BACK} años")
+    print("Diseños: todos los diseños relevantes, incluidas revisiones")
+    print("sistemáticas y metaanálisis.")
     print("Modelos disponibles:", ", ".join(GEMINI_MODELS))
 
     existing_data = load_existing_articles()
-
-    existing_ids = get_existing_ids(
-        existing_data["articles"]
-    )
-
+    existing_ids = get_existing_ids(existing_data["articles"])
     candidates = find_studies(existing_ids)
 
     if not candidates:
@@ -617,40 +698,41 @@ def main():
         return
 
     published = 0
+    screened = 0
 
-    # Se prueba un estudio por ejecución.
-    # Si falla Gemini, no se marca como publicado.
-    # El estudio seguirá disponible en la siguiente ejecución.
+    # Se revisa un número limitado de candidatos para controlar
+    # el consumo de la cuota gratuita de Gemini.
+    for study in candidates[:MAX_CANDIDATES_TO_SCREEN]:
 
-    for study in candidates[:MAX_ARTICLES_PER_RUN]:
+        if published >= MAX_ARTICLES_PER_RUN:
+            break
 
         print("--------------------------------------")
-        print("Estudio seleccionado:")
+        print("Estudio candidato:")
         print(study["title"])
 
         try:
+            screened += 1
+            article = evaluate_and_generate(study)
 
-            article = generate_article(study)
+            if article is None:
+                continue
 
-            save_article(
-                article,
-                study,
-                existing_data
-            )
-
+            save_article(article, study, existing_data)
+            existing_ids = get_existing_ids(existing_data["articles"])
             published += 1
 
         except Exception as error:
-
-            print(f"Error generando el artículo: {error}")
-            print("El estudio no se marcará como publicado.")
-            print("Se podrá volver a intentar en otra ejecución.")
+            print(f"Error procesando el estudio: {error}")
+            print("Se continuará con el siguiente candidato.")
 
     if published == 0:
-        print("No se ha podido publicar ningún artículo.")
+        print("No se ha publicado ningún artículo en esta ejecución.")
 
     print("--------------------------------------")
-    print(f"Artículos publicados en esta ejecución: {published}")
+    print(f"Estudios evaluados: {screened}")
+    print(f"Artículos publicados: {published}")
+    print(f"Umbral científico aplicado: {SCIENTIFIC_THRESHOLD}/100")
     print("Proceso SPORT LAB finalizado.")
 
 
