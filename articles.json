@@ -1,0 +1,86 @@
+{
+  "updated_at": "2026-11-25",
+  "articles": [
+    {
+      "id": "ejercicio-cerebro-adolescentes-2025",
+      "title": "¿Hacer ejercicio puede ayudarte a pensar mejor?",
+      "teaser": "Una revisión de 21 estudios analiza cómo la actividad física se relaciona con la atención, la memoria de trabajo y otras capacidades cognitivas durante la adolescencia.",
+      "category": "Cerebro",
+      "icon": "🧠",
+      "type": "REVISIÓN SISTEMÁTICA Y METAANÁLISIS",
+      "year": "2025",
+      "read_minutes": 5,
+      "question": "¿Puede la actividad física mejorar algunas capacidades mentales durante la adolescencia?",
+      "study": "El equipo investigador quiso reunir los resultados de ensayos controlados aleatorizados que habían estudiado la relación entre programas de ejercicio y distintas funciones cognitivas en niños y adolescentes. Se fijaron en aspectos como las funciones ejecutivas, la atención, la memoria de trabajo, la flexibilidad cognitiva y el control inhibitorio.",
+      "method": "Los autores realizaron una revisión sistemática y un metaanálisis. Buscaron ensayos en varias bases de datos científicas y finalmente incluyeron 21 estudios. Un metaanálisis combina estadísticamente resultados de investigaciones diferentes para estimar el efecto global, teniendo en cuenta que no todos los estudios miden exactamente lo mismo.",
+      "results": "El análisis encontró mejoras estadísticamente significativas en varias medidas cognitivas en los grupos que realizaron ejercicio frente a los grupos de comparación. Por ejemplo, informó efectos positivos en atención, memoria de trabajo, flexibilidad cognitiva y control inhibitorio. Los resultados variaron según la capacidad evaluada y el tipo de ejercicio.",
+      "explained": "Las funciones ejecutivas son habilidades que nos ayudan a organizar acciones, mantener información en la mente, cambiar de estrategia y frenar respuestas impulsivas. En una clase de Educación Física aparecen continuamente: recordar reglas, decidir a quién pasar, cambiar de táctica o controlar el impulso de actuar demasiado pronto. La revisión sugiere que mantenerse físicamente activo puede beneficiar algunas de estas habilidades, aunque no significa que una sesión garantice mejores notas ni que el ejercicio sustituya al estudio.",
+      "limits": "Los estudios incluidos utilizaron programas, duraciones y pruebas cognitivas diferentes. Por eso no se puede convertir el resultado en una receta única ni afirmar que cualquier ejercicio produzca el mismo efecto en todas las personas. Una revisión resume la evidencia disponible hasta la fecha de búsqueda; no demuestra por sí sola todos los mecanismos biológicos que podrían explicarla.",
+      "takeaway": "Moverse puede beneficiar no solo al cuerpo: la evidencia revisada también apunta a mejoras en algunas habilidades cognitivas de niños y adolescentes.",
+      "authors": "Longyan Liu, Xianyang Xin y Ying Zhang",
+      "paper_title": "The effects of physical exercise on cognitive function in adolescents: a systematic review and meta-analysis",
+      "journal": "Frontiers in Psychology, 16, 1556721",
+      "identifier": "DOI: 10.3389/fpsyg.2025.1556721 · PMID: 40792082",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40792082/",
+      "quiz": [
+        {"q":"¿Qué tipo de trabajo científico es el estudio?", "options":["Un experimento con un solo alumno","Una revisión sistemática y metaanálisis","Una encuesta de opinión"], "correct":1,"explanation":"Reunió y analizó estadísticamente resultados de 21 estudios."},
+        {"q":"¿Qué es la memoria de trabajo?", "options":["Mantener y utilizar información durante un tiempo breve","Recordar únicamente fotografías de la infancia","La fuerza de los músculos de la espalda"], "correct":0,"explanation":"La memoria de trabajo permite mantener información activa mientras hacemos una tarea."},
+        {"q":"¿Qué conclusión es más rigurosa?", "options":["Todo ejercicio mejora siempre las notas","El ejercicio puede beneficiar algunas capacidades cognitivas, con resultados variables","El ejercicio sustituye al estudio"], "correct":1,"explanation":"La revisión encontró efectos positivos, pero también diferencias entre estudios y capacidades."}
+      ]
+    },
+    {
+      "id": "ejercicio-inteligencia-infancia-2024",
+      "title": "¿El ejercicio puede influir en la inteligencia?",
+      "teaser": "Un metaanálisis de 14 ensayos con más de 3.200 participantes estudió los efectos de las intervenciones de ejercicio en niños y adolescentes.",
+      "category": "Cerebro",
+      "icon": "⚡",
+      "type": "METAANÁLISIS DE ENSAYOS ALEATORIZADOS",
+      "year": "2024",
+      "read_minutes": 5,
+      "question": "¿Puede un programa de ejercicio producir cambios medibles en algunas pruebas de inteligencia?",
+      "study": "Los investigadores analizaron si las intervenciones de ejercicio físico podían influir en las puntuaciones de pruebas de inteligencia en población infantil y adolescente. La pregunta es distinta de preguntar si una persona deportista es más inteligente que otra: aquí se estudian intervenciones y cambios medidos en pruebas.",
+      "method": "El metaanálisis incluyó 14 ensayos controlados aleatorizados, con 3.203 participantes de entre 5 y 14 años. Los autores combinaron los resultados de los estudios que cumplían sus criterios y calcularon el efecto medio de las intervenciones sobre distintas medidas de inteligencia.",
+      "results": "Los autores encontraron una mejora estadísticamente significativa en la medida de inteligencia general frente a los grupos de control. También observaron un efecto positivo, más pequeño, en inteligencia fluida, que se relaciona con resolver problemas nuevos y detectar patrones. No pudieron combinar suficientes estudios para analizar de la misma manera la inteligencia cristalizada.",
+      "explained": "La inteligencia fluida se relaciona con razonar ante situaciones nuevas, encontrar relaciones y resolver problemas sin depender tanto de conocimientos aprendidos previamente. Las pruebas utilizadas en investigación intentan medir capacidades concretas; no describen por completo el potencial, la creatividad, las habilidades sociales ni el valor de una persona. El estudio aporta indicios de que programas de ejercicio pueden influir positivamente en algunas puntuaciones cognitivas.",
+      "limits": "Los participantes tenían entre 5 y 14 años, por lo que los resultados no deben trasladarse automáticamente a todas las edades. Los programas de ejercicio y las poblaciones variaron entre estudios. El resultado medio de un metaanálisis no predice cuánto cambiará una persona concreta y no significa que el ejercicio aumente de forma garantizada el cociente intelectual de cada alumno.",
+      "takeaway": "La investigación encontró efectos positivos medios en pruebas de inteligencia, pero no convierte el ejercicio en una fórmula mágica ni permite predecir cambios individuales.",
+      "authors": "Javier S. Morales y colaboradores",
+      "paper_title": "Exercise Interventions and Intelligence in Children and Adolescents: A Meta-Analysis",
+      "journal": "Pediatrics, 154(6)",
+      "identifier": "DOI: 10.1542/peds.2023-064771 · PMID: 39506553",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39506553/",
+      "quiz": [
+        {"q":"¿Cuántos ensayos controlados incluyó el metaanálisis?", "options":["14","3.203","140"], "correct":0,"explanation":"Se incluyeron 14 ensayos con un total de 3.203 participantes."},
+        {"q":"¿Qué describe mejor la inteligencia fluida?", "options":["La capacidad pulmonar","Resolver problemas nuevos y reconocer patrones","La velocidad máxima al correr"], "correct":1,"explanation":"La inteligencia fluida se relaciona con el razonamiento ante problemas novedosos."},
+        {"q":"¿Qué NO permite afirmar este estudio?", "options":["Que encontró un efecto medio positivo","Que todas las personas aumentarán su CI de forma garantizada","Que estudió niños y adolescentes"], "correct":1,"explanation":"Un efecto medio de grupo no garantiza el mismo cambio en cada persona."}
+      ]
+    },
+    {
+      "id": "deportes-equipo-funciones-ejecutivas-2023",
+      "title": "¿Los deportes de equipo entrenan también tu cerebro?",
+      "teaser": "Una revisión con metaanálisis comparó distintos tipos de actividad física y su relación con habilidades como actualizar información y frenar respuestas automáticas.",
+      "category": "Rendimiento",
+      "icon": "🏀",
+      "type": "REVISIÓN SISTEMÁTICA Y METAANÁLISIS EN RED",
+      "year": "2023",
+      "read_minutes": 5,
+      "question": "Cuando juegas un partido, ¿estás entrenando únicamente tus músculos o también habilidades mentales?",
+      "study": "El estudio comparó distintos tipos de actividad física y su relación con las funciones ejecutivas en niños y adolescentes. Estas funciones ayudan a controlar la conducta y adaptar las decisiones a lo que ocurre alrededor.",
+      "method": "Los autores realizaron una revisión sistemática y un metaanálisis en red de ensayos controlados aleatorizados. Este método permite comparar varias modalidades de actividad física, incluso cuando no todas han sido comparadas directamente entre sí en un mismo ensayo.",
+      "results": "El análisis encontró que los juegos con balón destacaban en algunas medidas concretas, como la actualización de información y el tiempo de respuesta en tareas de inhibición. Otras modalidades, como actividades físicamente activas que exigen pensar y coordinarse, o la danza, destacaron en otros resultados. No hubo una única modalidad ganadora para todas las habilidades.",
+      "explained": "En un deporte de equipo hay que observar compañeros y rivales, recordar la situación del juego, anticipar, decidir y cambiar de plan en segundos. Esas demandas se parecen a algunas tareas utilizadas para estudiar las funciones ejecutivas. Por eso los juegos deportivos pueden ser interesantes no solo por el esfuerzo físico, sino también por las decisiones que exigen.",
+      "limits": "El resultado depende de qué habilidad concreta se mida y de cómo se diseñen los estudios. Un metaanálisis en red estima comparaciones entre modalidades, pero no demuestra que todos los deportes de equipo mejoren todas las capacidades mentales ni que un deporte sea siempre superior para cualquier persona.",
+      "takeaway": "Los deportes con decisiones constantes pueden combinar actividad física y retos cognitivos; los beneficios observados dependen de la habilidad que se evalúe.",
+      "authors": "Autores del estudio (consulta la ficha bibliográfica original)",
+      "paper_title": "Comparative efficacy of physical activity types on executive functions in children and adolescents: A network meta-analysis of randomized controlled trials",
+      "journal": "Journal of Science and Medicine in Sport",
+      "identifier": "DOI: 10.1016/j.jsams.2023.11.006 · PMID: 38042755",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38042755/",
+      "quiz": [
+        {"q":"¿Qué caracteriza a las funciones ejecutivas?", "options":["Ayudan a planificar, actualizar información y controlar respuestas","Solo miden la fuerza muscular","Son una parte del sistema digestivo"], "correct":0,"explanation":"Son procesos cognitivos que ayudan a regular y adaptar nuestra conducta."},
+        {"q":"¿Qué encontró el estudio sobre las modalidades deportivas?", "options":["Una modalidad fue la mejor en absolutamente todo","Distintas modalidades destacaron en medidas diferentes","Ninguna modalidad mostró diferencias"], "correct":1,"explanation":"Los resultados variaron según la función ejecutiva que se evaluaba."},
+        {"q":"¿Por qué un partido puede exigir habilidades cognitivas?", "options":["Porque no requiere tomar decisiones","Porque hay que observar, recordar, anticipar y adaptar decisiones","Porque elimina la necesidad de atención"], "correct":1,"explanation":"El juego obliga a procesar información y ajustar la conducta continuamente."}
+      ]
+    }
+  ]
+}
