@@ -49,3 +49,5 @@ jobs:
       - name: Publicar SPORT LAB
         id: deployment
         uses: actions/deploy-pages@v4
+
+# Despliegue independiente para cambios de interfaz.
