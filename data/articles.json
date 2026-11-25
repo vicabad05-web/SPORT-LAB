@@ -2,6 +2,90 @@
   "articles": [
     {
       "category": "Salud",
+      "icon": "📊",
+      "type": "Investigación",
+      "title": "¿Qué hábitos diarios se relacionan con el peso corporal en la infancia?",
+      "teaser": "¿Sabías que la forma de ir al colegio o el tiempo que tardas en comer se relacionan con tu salud? Analizamos un estudio con más de 1.500 escolares en China.",
+      "question": "¿Crees que pequeños detalles como ir andando a clase o comer sin prisa pueden estar vinculados con nuestro peso corporal?",
+      "study": "Un equipo de investigadores estudió qué factores del estilo de vida (como la alimentación, el transporte y el ejercicio) están asociados con el sobrepeso y la obesidad en escolares de 6 a 12 años en Xiamen (China).",
+      "method": "Realizaron un estudio transversal mediante un cuestionario en línea. Recopilaron datos válidos de 1.524 tutores de estudiantes de dos escuelas de primaria. Dividieron a los participantes en dos grupos (sin sobrepeso/obesidad y con sobrepeso/obesidad) y compararon sus respuestas mediante análisis estadísticos.",
+      "results": "Los análisis mostraron que ser niño (sexo masculino), consumir bebidas sin calorías más de dos veces por semana y ser llevado al colegio en coche se asociaron a una mayor presencia de sobrepeso u obesidad. En cambio, tardar entre 10 y 20 minutos o más de 20 minutos en comer, pasar más de 2 horas al día al aire libre durante las vacaciones, realizar al menos 60 minutos de actividad física de moderada a intensa (de 2 a 7 días por semana) y comer dulces más de dos veces por semana se asociaron a una menor presencia de sobrepeso u obesidad.",
+      "explained": "En las ciencias del deporte y la salud observamos cómo interactúan distintos hábitos. Los datos sugieren que mantenerse activo (ejercicio diario y actividades al aire libre) y comer sin prisas (más de 10 minutos) se vinculan a un peso más saludable. Por otro lado, la inactividad en los desplazamientos (ir en coche) o ciertos patrones de consumo de bebidas muestran una asociación opuesta. Sorprendentemente, en este grupo el consumo frecuente de dulces mostró una relación inversa con el sobrepeso, lo que nos recuerda que la alimentación depende del equilibrio total de la dieta y el gasto energético, y no de un solo alimento.",
+      "limits": "Es un estudio transversal, lo que significa que solo observa asociaciones en un momento determinado: NO demuestra relación de causa y efecto. Además, la información procede de cuestionarios rellenados por los tutores (lo que puede generar fallos de memoria) y se limita a dos escuelas de una ciudad concreta (Xiamen).",
+      "takeaway": "Realizar al menos 60 minutos de actividad física e ir sin prisa al comer se asocian con una vida más saludable, pero recuerda: que dos variables aparezcan juntas no significa que una cause la otra.",
+      "read_minutes": 5,
+      "quiz": [
+        {
+          "question": "¿Qué tipo de diseño metodológico utilizó este estudio?",
+          "options": [
+            "Un estudio transversal basado en cuestionarios",
+            "Un ensayo clínico de laboratorio de 10 años",
+            "Un experimento de entrenamiento de alta intensidad",
+            "Una revisión teórica sin participantes"
+          ],
+          "correct": 0,
+          "explanation": "El estudio recopiló información en un momento concreto mediante 1.524 cuestionarios respondidos por los tutores."
+        },
+        {
+          "question": "¿Cuál de estos factores se asoció a una MAYOR presencia de sobrepeso u obesidad?",
+          "options": [
+            "Jugar al aire libre más de 2 horas en vacaciones",
+            "Ser llevado al colegio en coche por los padres",
+            "Tardar más de 20 minutos en comer",
+            "Hacer 60 minutos de ejercicio físico 5 días a la semana"
+          ],
+          "correct": 1,
+          "explanation": "El desplazamiento pasivo (en coche) hacia la escuela mostró una asociación positiva con el sobrepeso u obesidad."
+        },
+        {
+          "question": "¿Qué tiempo de duración de las comidas se asoció inversamente con el sobrepeso en el estudio?",
+          "options": [
+            "Comer en menos de 5 minutos",
+            "Comer en menos de 10 minutos",
+            "Tardar entre 10 y 20 minutos, o más de 20 minutos",
+            "La duración de la comida no mostró ninguna relación"
+          ],
+          "correct": 2,
+          "explanation": "Comer con una duración moderada (10-20 min) o lenta (>20 min) se asoció de forma inversa con el exceso de peso."
+        },
+        {
+          "question": "¿Por qué NO podemos decir que ir en coche 'cause' directamente sobrepeso tras leer este estudio?",
+          "options": [
+            "Porque los estudios transversales muestran correlación, no causalidad",
+            "Porque los coches no tienen relación con la salud física",
+            "Porque los datos fueron inventados por los científicos",
+            "Porque solo se encuestó a deportistas profesionales"
+          ],
+          "correct": 0,
+          "explanation": "Los estudios transversales identifican relaciones o asociaciones entre variables, pero no pueden probar que una sea la causa directa de la otra."
+        },
+        {
+          "question": "¿Cuánta actividad física (moderada a intensa) se asoció con una menor presencia de sobrepeso u obesidad?",
+          "options": [
+            "10 minutos a la semana",
+            "Al menos 60 minutos acumulados varios días a la semana",
+            "4 horas seguidas solo los domingos",
+            "No se analizó la actividad física en el estudio"
+          ],
+          "correct": 1,
+          "explanation": "Acumular al menos 60 minutos de actividad moderada a intensa en 2-4 o 5-7 días a la semana se asoció inversamente con el sobrepeso."
+        }
+      ],
+      "ai_model": "gemini-3.5-flash",
+      "id": "43080315",
+      "authors": "",
+      "paper_title": "Factors associated with overweight and obesity among primary school children in Xiamen, China: a cross-sectional study.",
+      "journal": "Frontiers in public health",
+      "year": "2026",
+      "doi": "10.3389/fpubh.2026.1998838",
+      "pmid": "43080315",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/43080315/",
+      "source": "PubMed",
+      "published_at": "2026-11-25",
+      "evidence_window_years": 5
+    },
+    {
+      "category": "Salud",
       "icon": "🏥",
       "type": "Investigación",
       "title": "Mucho más que medicinas: ¿qué necesita la sociedad para afrontar la próxima pandemia?",
