@@ -2,12 +2,6 @@
 name: SPORT LAB - Publicacion automatica
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'index.html'
-      - '.github/workflows/publish.yml'
   schedule:
     - cron: '0 7 * * 1,3,5'
   workflow_dispatch:
