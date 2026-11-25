@@ -8,13 +8,26 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Preparar Python
         uses: actions/setup-python@v5
@@ -26,10 +39,28 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/fetch_articles.py
 
-      - name: Guardar publicaciones
+      - name: Guardar publicaciones en GitHub
         run: |
           git config user.name "SPORT LAB Bot"
           git config user.email "actions@github.com"
           git add data/articles.json
           git diff --cached --quiet || git commit -m "Actualizacion SPORT LAB"
           git push
+
+      - name: Preparar web para publicar
+        run: |
+          mkdir -p _site/data
+          cp index.html _site/index.html
+          cp data/articles.json _site/data/articles.json
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir archivos de la web
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Publicar SPORT LAB
+        id: deployment
+        uses: actions/deploy-pages@v4
