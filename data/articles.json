@@ -1,6 +1,101 @@
 {
   "articles": [
     {
+      "category": "Salud",
+      "icon": "🏋️‍♀️",
+      "type": "Investigación",
+      "title": "¿Se puede ganar fuerza muscular durante el tratamiento con quimioterapia?",
+      "teaser": "Un estudio científico revela que el entrenamiento en circuito supervisado ayuda a mejorar la fuerza y mantener la movilidad en pacientes con cáncer de mama en pleno tratamiento.",
+      "question": "¿Sabías que hacer ejercicio adaptado durante un tratamiento médico agresivo puede ayudar a combatir la debilidad muscular en lugar de empeorarla?",
+      "study": "Un grupo de investigadoras e investigadores analizó los efectos de un programa de entrenamiento en circuito supervisado en 40 pacientes operadas de cáncer de mama. El objetivo era comprobar si la actividad física planificada podía evitar el deterioro de la fuerza, la movilidad y la masa muscular durante la quimioterapia adyuvante.",
+      "method": "Las 40 participantes se dividieron en dos grupos de 20: un grupo que recibía quimioterapia adyuvante y otro que no. Todas realizaron un programa de entrenamiento en circuito utilizando el sistema Milon®, que combina ejercicio aeróbico con fuerza excéntrica (al 60% de la repetición máxima o 1RM). Los científicos evaluaron la fuerza en la extensión de rodilla, la velocidad de marcha, el equilibrio, la movilidad y la composición corporal al inicio y al final de la intervención.",
+      "results": "Ambos grupos mejoraron significativamente la fuerza en las piernas (extensores de la rodilla). Las personas que recibían quimioterapia experimentaron ganancias de fuerza de forma gradual y constante a lo largo del programa, mientras que el grupo sin quimioterapia mejoró más rápido en las primeras fases. Además, las pacientes con quimioterapia mantuvieron su capacidad funcional y mejoraron su velocidad de marcha. El índice de masa corporal (IMC) se redujo ligeramente en general, mientras que la masa magra muscular se mantuvo estable.",
+      "explained": "La quimioterapia suele provocar mucha fatiga y debilidad muscular. Sin embargo, cuando los músculos reciben un estímulo de entrenamiento adecuado y supervisado (combinando resistencia y ejercicio aeróbico), siguen teniendo la capacidad fisiológica de adaptarse y volverse más fuertes. El ejercicio actúa como una señal biomecánica que protege el tejido muscular y mantiene el rendimiento del cuerpo durante el tratamiento.",
+      "limits": "El estudio es retrospectivo y cuenta con una muestra pequeña de 40 participantes. Al ser una investigación preliminar, sus resultados deben ser confirmados en ensayos clínicos prospectivos de mayor tamaño antes de generalizar las conclusiones.",
+      "takeaway": "El entrenamiento en circuito adaptado y supervisado es una herramienta segura y eficaz para mantener la movilidad y aumentar la fuerza muscular durante la quimioterapia.",
+      "read_minutes": 4,
+      "quiz": [
+        {
+          "question": "¿Cuál fue el objetivo principal de este estudio sobre el cáncer de mama?",
+          "options": [
+            "Probar un nuevo fármaco para sustituir la quimioterapia.",
+            "Analizar el impacto del ejercicio en circuito supervisado sobre la fuerza y la capacidad funcional.",
+            "Demostrar que el descanso absoluto es el mejor tratamiento.",
+            "Evaluar una dieta estricta sin carbohidratos en las pacientes."
+          ],
+          "correct": 1,
+          "explanation": "El estudio investigó los efectos de un programa de entrenamiento en circuito supervisado en la fuerza y la capacidad funcional de pacientes con o sin quimioterapia."
+        },
+        {
+          "question": "¿Qué componentes incluyó el programa de entrenamiento Milon®?",
+          "options": [
+            "Solo estiramientos y relajación.",
+            "Entrenamiento con pesas al 100% de la fuerza máxima sin pausa.",
+            "Combinación de ejercicio aeróbico y resistencia excéntrica al 60% de 1RM.",
+            "Pruebas de natación de alta intensidad."
+          ],
+          "correct": 2,
+          "explanation": "El programa integró ejercicio aeróbico y entrenamiento de fuerza excéntrica regulado al 60% del 1RM de cada participante."
+        },
+        {
+          "question": "¿Qué ocurrió con la fuerza de piernas en las pacientes que estaban recibiendo quimioterapia?",
+          "options": [
+            "Empeoró gravemente al avanzar el tratamiento.",
+            "Mostró mejoras progresivas y sostenidas durante el programa.",
+            "No sufrió ninguna variación.",
+            "Aumentó solo durante la primera sesión y luego cayó."
+          ],
+          "correct": 1,
+          "explanation": "Las pacientes en quimioterapia mostraron mejoras graduales y sostenidas en la fuerza de los extensores de la rodilla."
+        },
+        {
+          "question": "¿Qué cambio relevante observaron en la marcha del grupo con quimioterapia?",
+          "options": [
+            "Una mejora significativa en la velocidad al caminar.",
+            "Una disminución drástica en la capacidad para caminar.",
+            "No pudieron terminar las pruebas de marcha.",
+            "Perdieron completamente el equilibrio al andar."
+          ],
+          "correct": 0,
+          "explanation": "El grupo que recibía quimioterapia mantuvo su rendimiento funcional general y mostró una mejora significativa en la velocidad al caminar."
+        },
+        {
+          "question": "¿Qué limitación principal presenta esta investigación?",
+          "options": [
+            "No se hicieron mediciones físicas de ningún tipo.",
+            "Es un estudio retrospectivo con un tamaño de muestra reducido (40 personas).",
+            "Duro más de 30 años y los datos quedaron desactualizados.",
+            "Se realizó únicamente en deportistas olímpicos de élite."
+          ],
+          "correct": 1,
+          "explanation": "Al tratarse de un estudio retrospectivo preliminary con 40 participantes en total, los autores señalan que se necesitan estudios prospectivos más amplios para confirmar los datos."
+        }
+      ],
+      "scientific_score": 74,
+      "scientific_threshold": 70,
+      "scientific_score_breakdown": {
+        "relevance": 26,
+        "methodology": 17,
+        "analysis": 15,
+        "sample_or_sources": 9,
+        "transparency": 7
+      },
+      "study_design": "Estudio retrospectivo de cohortes",
+      "scientific_reason": "El estudio posee una elevada relevancia en ciencias del ejercicio aplicadas a la salud en oncología. Metodológicamente evalúa de forma objetiva la fuerza y funcionalidad tras un programa estructurado. Sin embargo, su diseño retrospectivo y el tamaño muestral pequeño (n=40 en total) limitan la potencia para extrapolar causaciones definitivas.",
+      "ai_model": "gemini-3.5-flash",
+      "id": "43082480",
+      "authors": "",
+      "paper_title": "Circuit-Based Exercise in Patients with Breast Cancer During Adjuvant Chemotherapy: A Preliminary Retrospective Study.",
+      "journal": "Current oncology (Toronto, Ont.)",
+      "year": "2026",
+      "doi": "10.3390/curroncol33110717",
+      "pmid": "43082480",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/43082480/",
+      "source": "PubMed",
+      "published_at": "2026-11-25",
+      "evidence_window_years": 5
+    },
+    {
       "category": "Fisiología",
       "icon": "❤️",
       "type": "Investigación",
