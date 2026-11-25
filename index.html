@@ -28,13 +28,21 @@ const SUPABASE_URL='https://qxoqygypmnrbzakpiylq.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_j12SLqB0ApdJMsUEfG-Yow_qcCc1VOk';
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 let currentProfile=null;
+function makeStudentAlias(){
+ const adjectives=['ATLETA','CURIOSO','RAPIDO','FUERTE','AGIL','VALIENTE','EXPLORADOR','CIENTIFICO'];
+ const nouns=['AZUL','VERDE','ROJO','LOBO','HALCON','TIGRE','COMETA','RAYO'];
+ return adjectives[Math.floor(Math.random()*adjectives.length)]+'_'+nouns[Math.floor(Math.random()*nouns.length)]+'_'+Math.floor(1000+Math.random()*9000);
+}
 async function startAnonymousSession(){
  const button=document.getElementById('accountButton');
  const name=document.getElementById('accountName');
  const notice=document.getElementById('accountNotice');
+ if(button.disabled) return;
  button.disabled=true;
  name.textContent='CONECTANDO...';
+ notice.textContent='Conectando con el laboratorio...';
  try{
+  if(!window.supabase || !window.supabase.createClient) throw new Error('No se ha podido cargar la biblioteca de conexión. Recarga la página.');
   const sessionResult=await supabaseClient.auth.getSession();
   if(sessionResult.error) throw sessionResult.error;
   let session=sessionResult.data.session;
@@ -43,15 +51,27 @@ async function startAnonymousSession(){
    if(signInResult.error) throw signInResult.error;
    session=signInResult.data.session;
   }
-  const profileResult=await supabaseClient.from('profiles').select('alias,xp').eq('id',session.user.id).single();
+  if(!session || !session.user) throw new Error('Supabase no ha devuelto una sesión válida.');
+  let profileResult=await supabaseClient.from('profiles').select('alias,xp').eq('id',session.user.id).maybeSingle();
   if(profileResult.error) throw profileResult.error;
-  currentProfile=profileResult.data;
-  name.textContent=currentProfile.alias;
-  notice.textContent='Sesión anónima activa como '+currentProfile.alias+'. No se ha solicitado correo, nombre ni contraseña. El progreso compartido y el ranking se habilitarán tras configurar su validación segura.';
+  let profile=profileResult.data;
+  if(!profile){
+   const alias=makeStudentAlias();
+   const insertResult=await supabaseClient.from('profiles').insert({id:session.user.id,alias:alias,xp:0});
+   if(insertResult.error) throw insertResult.error;
+   profileResult=await supabaseClient.from('profiles').select('alias,xp').eq('id',session.user.id).single();
+   if(profileResult.error) throw profileResult.error;
+   profile=profileResult.data;
+  }
+  currentProfile=profile;
+  name.textContent=profile.alias;
+  document.getElementById('navLevel').textContent='NV. '+(Math.floor((Number(profile.xp)||0)/250)+1);
+  notice.textContent='¡Bienvenido, '+profile.alias+'! Tu perfil anónimo está creado y conectado. No has tenido que introducir datos personales.';
  }catch(error){
-  console.error('SPORT LAB auth:',error);
+  console.error('SPORT LAB auth error:',error);
   name.textContent='REINTENTAR';
-  notice.textContent='No se ha podido iniciar la sesión anónima. Comprueba la conexión e inténtalo de nuevo.';
+  const detail=[error.code,error.message].filter(Boolean).join(' — ');
+  notice.textContent='No se pudo completar el registro: '+(detail||'error desconocido')+'. Envíanos una captura de este mensaje para corregirlo.';
  }finally{
   button.disabled=false;
  }
