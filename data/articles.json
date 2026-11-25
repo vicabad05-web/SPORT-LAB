@@ -1,6 +1,101 @@
 {
   "articles": [
     {
+      "category": "Fisiología",
+      "icon": "❤️",
+      "type": "Investigación",
+      "title": "¿Hablan el corazón y los músculos entre sí cuando hay problemas cardíacos?",
+      "teaser": "Un estudio analiza cómo el corazón estresado envía señales químicas a los músculos y qué hay de cierto en que sea el único responsable de su desgaste.",
+      "question": "Alguna vez has notado que cuando te falta energía o estás cansado, tus músculos no responden igual? ¿Podría el corazón mandar mensajes directos a tus músculos?",
+      "study": "Los científicos investigaron la conexión entre el corazón y el músculo esquelético en pacientes con insuficiencia cardíaca. Querían averiguar si las sustancias químicas que circulan por la sangre y que aumentan cuando el corazón sufre son realmente fabricadas por el corazón o si tienen otro origen.",
+      "method": "Para ello, examinaron la literatura científica y evaluaron cinco mediadores solubles (moléculas mensajeras como GDF15, FGF21, miostatina, angiotensina II y activina A) junto con vesículas extracelulares cardíacas. Analizaron si existían pruebas reales (como experimentos donde se elimina o modifica el gen en el corazón) para demostrar que el corazón es la fuente principal de estas moléculas en la sangre.",
+      "results": "Los resultados mostraron que solo en el caso de la miostatina existen pruebas claras y directas de que el corazón genera esta molécula. Para otras sustancias muy conocidas, como el GDF15 y el FGF21, no se ha demostrado que el corazón sea el que aporte la mayor parte a la sangre, por lo que los científicos prefieren llamarlas moléculas asociadas al estrés cardíaco en lugar de decir que provienen exclusivamente del corazón.",
+      "explained": "Cuando el corazón sufre (como ocurre en la insuficiencia cardíaca), a menudo los músculos de las personas se debilitan o reducen su tamaño. Tradicionalmente se pensaba que esto pasaba solo por la falta de flujo sanguíneo o por no hacer ejercicio. Este estudio nos enseña que el cuerpo libera moléculas mensajeras al torrente sanguíneo, pero los científicos nos recuerdan que no debemos confundir correlación con causalidad: ver una sustancia en la sangre no significa automáticamente que el corazón la haya fabricado para dañar el músculo.",
+      "limits": "Los autores señalan que se necesitan con urgencia más experimentos específicos, como tomar muestras de sangre antes y después de pasar por el corazón (muestreo arteriovenoso) y estudios donde se bloquee la función cardíaca para confirmar el papel exacto de estas moléculas antes de crear tratamientos médicos basados en ellas.",
+      "takeaway": "No todo lo que viaja por la sangre y se relaciona con una enfermedad cardíaca está fabricado por el corazón; se necesita mucha investigación rigurosa para demostrar el origen real de estas señales.",
+      "read_minutes": 5,
+      "quiz": [
+        {
+          "question": "¿Qué problema acompaña frecuentemente a la insuficiencia cardíaca según el estudio?",
+          "options": [
+            "El aumento masivo de la masa muscular",
+            "El desgaste de los músculos esqueléticos",
+            "La mejora de la capacidad pulmonar",
+            "El crecimiento de los huesos"
+          ],
+          "correct": 1,
+          "explanation": "El estudio indica que la insuficiencia cardíaca va acompañada con frecuencia de desgaste muscular en aproximadamente uno de cada cinco pacientes ambulatorios."
+        },
+        {
+          "question": "De las moléculas analizadas, ¿para cuál existe evidencia directa de pérdida y ganancia de función específica en el corazón?",
+          "options": [
+            "GDF15",
+            "FGF21",
+            "Miostatina",
+            "Angiotensina II"
+          ],
+          "correct": 2,
+          "explanation": "El texto señala que solo para la miostatina existe evidencia específica de pérdida y ganancia de función a nivel cardíaco."
+        },
+        {
+          "question": "Según el artículo, ¿por qué es importante distinguir si una molécula es verdaderamente 'cardíaca-derivada'?",
+          "options": [
+            "Para saber si el corazón es realmente el origen de esa sustancia en la sangre o si está asociada de otra forma al estrés.",
+            "Para saber qué comer antes de hacer deporte.",
+            "Para medir la velocidad al correr.",
+            "Para calcular la fuerza de los huesos."
+          ],
+          "correct": 0,
+          "explanation": "Los autores destacan que para algunas moléculas (como GDF15 o FGF21) la contribución cardíaca no está probada, por lo que es mejor llamarlas asociadas al estrés cardíaco."
+        },
+        {
+          "question": "¿Qué tipo de experimentos sugieren los científicos que son necesarios antes de considerar estas vías como dianas terapéuticas?",
+          "options": [
+            "Encuestas sobre hábitos de sueño",
+            "Muestreos arteriovenosos y experimentos de pérdida de función cardíaca",
+            "Pruebas de flexibilidad en la escuela",
+            "Medición de la altura de los pacientes"
+          ],
+          "correct": 1,
+          "explanation": "El estudio define explícitamente la necesidad de realizar experimentos de muestreo arteriovenoso y pérdida de función cardíaca."
+        },
+        {
+          "question": "Si una sustancia aumenta en la sangre cuando hay estrés cardíaco, ¿qué precaución debemos tener?",
+          "options": [
+            "Asumir que el músculo la ha fabricado para curar el corazón",
+            "No confundir la presencia de la sustancia con una prueba definitiva de que proviene exclusivamente del corazón",
+            "Tomar medicamentos inmediatamente",
+            "Dejar de hacer ejercicio para siempre"
+          ],
+          "correct": 1,
+          "explanation": "El estudio advierte que la contribución del corazón a la sangre no siempre está demostrada, por lo que no se debe asumir un origen cardíaco sin pruebas."
+        }
+      ],
+      "scientific_score": 85,
+      "scientific_threshold": 70,
+      "scientific_score_breakdown": {
+        "relevance": 25,
+        "methodology": 20,
+        "analysis": 18,
+        "sample_or_sources": 12,
+        "transparency": 10
+      },
+      "study_design": "Revisión bibliográfica / Análisis conceptual",
+      "scientific_reason": "El estudio ofrece una relevancia muy alta para la fisiología del ejercicio y la salud al analizar la comunicación entre el corazón y el músculo esquelético en la insuficiencia cardíaca. Evalúa críticamente la evidencia de diferentes mediadores moleculares, exigiendo rigor experimental (como estudios de pérdida de función y muestreo arteriovenoso) antes de establecer causalidad o dianas terapéuticas. Aunque no es un ensayo experimental propio, su análisis conceptual es muy sólido y transparente.",
+      "ai_model": "gemini-3.5-flash-lite",
+      "id": "43082779",
+      "authors": "",
+      "paper_title": "Heart-to-Muscle Signaling in Heart Failure: Which Catabolic Mediators Are Truly Cardiac-Derived?",
+      "journal": "Cells",
+      "year": "2026",
+      "doi": "10.3390/cells15222120",
+      "pmid": "43082779",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/43082779/",
+      "source": "PubMed",
+      "published_at": "2026-11-25",
+      "evidence_window_years": 5
+    },
+    {
       "category": "Salud",
       "icon": "🧠",
       "type": "Investigación",
