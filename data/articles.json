@@ -2,6 +2,90 @@
   "articles": [
     {
       "category": "Salud",
+      "icon": "🧠",
+      "type": "Investigación",
+      "title": "Corazones fuertes, cerebros en alerta: ¿Qué relación hay entre los problemas cardíacos y las convulsiones en jóvenes?",
+      "teaser": "Un reciente estudio analiza por qué algunos niños y jóvenes con cardiopatías congénitas pueden sufrir episodios de convulsiones o epilepsia, y qué factores están relacionados con ello.",
+      "question": "¿Crees que un problema en el corazón puede influir en cómo funciona el cerebro de una persona joven?",
+      "study": "Los científicos investigaron cuál es la frecuencia (prevalencia) con la que los niños y jóvenes que nacen con cardiopatías congénitas (problemas en el corazón desde el nacimiento) desarrollan convulsiones agudas o epilepsia a largo plazo, y qué factores están relacionados con esto.",
+      "method": "Realizaron una revisión sistemática y un metaanálisis. Esto significa que buscaron en grandes bases de datos científicas todos los estudios previos sobre este tema, analizaron los datos de miles de participantes y utilizaron modelos estadísticos para calcular porcentajes globales y factores asociados.",
+      "results": "Analizando varios estudios con más de 50.000 participantes, descubrieron que la prevalencia estimada de epilepsia a largo plazo era del 3,1%. En cuanto a las convulsiones agudas o tempranas en el hospital, la estimación descriptiva fue del 7,5%. Además, observaron que factores como complicaciones neurológicas, el uso de máquinas de circulación extracorpórea (ECMO), tener una fisiología de ventrículo único, cirugías cardíacas repetidas y la prematuridad estaban asociados a una mayor probabilidad de sufrir estos episodios.",
+      "explained": "Para entenderlo en la ESO: el corazón es la bomba que envía sangre y oxígeno a todo el cuerpo, incluido el cerebro. Cuando un niño nace con una cardiopatía congénita, el flujo sanguíneo y de oxígeno puede verse alterado, especialmente durante cirugías complejas o tratamientos intensivos. Las convulsiones son descargas eléctricas repentinas y descontroladas en el cerebro. El estudio muestra que ciertas situaciones médicas graves (como cirugías repetidas o nacer prematuro) coinciden con un mayor riesgo de sufrir estas descargas, aunque el estudio destaca que encontrar una asociación no significa que un factor cause directamente el otro.",
+      "limits": "Los autores señalaron limitaciones importantes: los estudios analizados eran observacionales, por lo que muestran asociaciones estadísticas pero no relaciones de causa y efecto. Además, la cantidad de estudios disponibles era limitada y había mucha diferencia entre los resultados de unas investigaciones y otras.",
+      "takeaway": "Los jóvenes con cardiopatías congénitas pueden enfrentarse a un riesgo de sufrir convulsiones o epilepsia, y existen ciertos factores médicos asociados a ello, lo que ayuda a los científicos a entender mejor la salud neurológica de estos pacientes sin extraer conclusiones definitivas sobre las causas.",
+      "read_minutes": 5,
+      "quiz": [
+        {
+          "question": "¿Qué tipo de estudio realizaron los investigadores?",
+          "options": [
+            "Un ensayo clínico con medicamentos",
+            "Una revisión sistemática y metaanálisis",
+            "Un experimento de rendimiento físico en atletas",
+            "Una encuesta nutricional en colegios"
+          ],
+          "correct": 1,
+          "explanation": "Los científicos buscaron y combinaron los datos de múltiples estudios previos mediante una revisión sistemática y metaanálisis."
+        },
+        {
+          "question": "¿Cuál fue el porcentaje estimado de epilepsia a largo plazo según el análisis principal?",
+          "options": [
+            "Del 3,1%",
+            "Del 7,5%",
+            "Del 50,5%",
+            "Del 99,4%"
+          ],
+          "correct": 0,
+          "explanation": "El estudio indicó que la prevalencia combinada para la epilepsia a largo plazo fue del 3,1%."
+        },
+        {
+          "question": "Según el texto, ¿qué significa que una variable esté asociada a las convulsiones?",
+          "options": [
+            "Que la causa directamente al 100%",
+            "Que existe una relación estadística observada, pero no demuestra una relación de causa y efecto",
+            "Que se puede prevenir con una dieta adecuada",
+            "Que es un síntoma que ocurre en todos los pacientes"
+          ],
+          "correct": 1,
+          "explanation": "El estudio aclara que las asociaciones observadas no establecen efectos causales."
+        },
+        {
+          "question": "¿Cuál de los siguientes es uno de los factores asociados a un mayor riesgo según la investigación?",
+          "options": [
+            "Hacer ejercicio aeróbico diario",
+            "La prematuridad",
+            "Comer demasiados azúcares",
+            "Dormir menos de 8 horas"
+          ],
+          "correct": 1,
+          "explanation": "Entre los factores mencionados en el estudio se encuentra la prematuridad, junto con cirugías cardíacas repetidas y el uso de ECMO."
+        },
+        {
+          "question": "¿Qué órgano del cuerpo bombea la sangre que llega al cerebro?",
+          "options": [
+            "Los pulmones",
+            "El hígado",
+            "El corazón",
+            "Los riñones"
+          ],
+          "correct": 2,
+          "explanation": "El corazón es el órgano encargado de bombear la sangre cargada de oxígeno hacia todo el cuerpo, incluido el cerebro."
+        }
+      ],
+      "ai_model": "gemini-3.5-flash-lite",
+      "id": "43080303",
+      "authors": "",
+      "paper_title": "Prevalence and associated factors of seizures and epilepsy in children with congenital heart disease: a systematic review and meta-analysis.",
+      "journal": "Frontiers in public health",
+      "year": "2026",
+      "doi": "10.3389/fpubh.2026.1955892",
+      "pmid": "43080303",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/43080303/",
+      "source": "PubMed",
+      "published_at": "2026-11-25",
+      "evidence_window_years": 5
+    },
+    {
+      "category": "Salud",
       "icon": "📊",
       "type": "Investigación",
       "title": "¿Qué hábitos diarios se relacionan con el peso corporal en la infancia?",
