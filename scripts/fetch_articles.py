@@ -1,8 +1,8 @@
 
 #!/usr/bin/env python3
 # ============================================================
-# SPORT LAB
-# Buscador y redactor automatico de articulos cientificos
+# SPORT LAB - MOTOR CIENTIFICO AUTOMATICO
+# PubMed + Europe PMC + Gemini
 # Investigaciones de los ultimos cinco anos
 # ============================================================
 
@@ -25,20 +25,15 @@ from zoneinfo import ZoneInfo
 # ------------------------------------------------------------
 
 ROOT = Path(__file__).resolve().parents[1]
-
 ARTICLES_FILE = ROOT / "data" / "articles.json"
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
-GEMINI_MODEL = os.getenv(
-    "GEMINI_MODEL",
-    "gemini-2.5-flash"
-)
+NCBI_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
+EPMC_BASE = "https://www.ebi.ac.uk/europepmc/webservices/rest"
 
-EUROPE_PMC = (
-    "https://www.ebi.ac.uk/europepmc/"
-    "webservices/rest"
-)
+USER_AGENT = "SPORT-LAB/2.0 educational science project"
 
 CATEGORIES = [
     "Cerebro",
@@ -49,67 +44,84 @@ CATEGORIES = [
     "Salud"
 ]
 
-USER_AGENT = "SPORT-LAB/2.0 educational science project"
+TODAY = date.today()
+START_YEAR = TODAY.year - 5
 
 
 # ------------------------------------------------------------
 # PETICIONES HTTP CON REINTENTOS
 # ------------------------------------------------------------
 
-def request_url(url, timeout=120, attempts=3):
+def http_request(url, data=None, timeout=90, attempts=4):
 
-    request = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": USER_AGENT,
-            "Accept": "*/*"
-        }
-    )
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Accept": "*/*"
+    }
+
+    if data is not None:
+        headers["Content-Type"] = "application/x-www-form-urlencoded"
 
     last_error = None
 
     for attempt in range(attempts):
 
         try:
+            request = urllib.request.Request(
+                url,
+                data=data,
+                headers=headers,
+                method="POST" if data is not None else "GET"
+            )
+
             with urllib.request.urlopen(
                 request,
                 timeout=timeout
             ) as response:
-
                 return response.read()
+
+        except urllib.error.HTTPError as error:
+
+            last_error = error
+
+            retry_after = error.headers.get("Retry-After")
+            wait = int(retry_after) if retry_after and retry_after.isdigit() else 5 * (attempt + 1)
+
+            print(
+                f"HTTP {error.code}. "
+                f"Intento {attempt + 1}/{attempts}"
+            )
+
+            if error.code not in (429, 500, 502, 503, 504):
+                raise
+
+            if attempt < attempts - 1:
+                time.sleep(min(wait, 30))
 
         except Exception as error:
 
             last_error = error
 
             print(
-                f"Intento {attempt + 1}/{attempts} "
-                f"fallido: {error}"
+                f"Error de conexion. "
+                f"Intento {attempt + 1}/{attempts}: {error}"
             )
 
             if attempt < attempts - 1:
                 time.sleep(5 * (attempt + 1))
 
     raise RuntimeError(
-        f"No se pudo completar la petición: {last_error}"
+        f"Peticion fallida despues de varios intentos: {last_error}"
     )
 
 
 def get_json(url):
-
-    content = request_url(
-        url,
-        timeout=120,
-        attempts=3
-    )
-
-    return json.loads(
-        content.decode("utf-8")
-    )
+    content = http_request(url)
+    return json.loads(content.decode("utf-8"))
 
 
 # ------------------------------------------------------------
-# CARGAR ARTICULOS EXISTENTES
+# ALMACENAMIENTO
 # ------------------------------------------------------------
 
 def load_articles():
@@ -122,94 +134,213 @@ def load_articles():
     if not ARTICLES_FILE.exists():
         return {"articles": []}
 
-    try:
-        data = json.loads(
-            ARTICLES_FILE.read_text(
-                encoding="utf-8"
-            )
-        )
-
-        if isinstance(data, list):
-            return {"articles": data}
-
-        if not isinstance(data, dict):
-            return {"articles": []}
-
-        if not isinstance(data.get("articles"), list):
-            data["articles"] = []
-
-        return data
-
-    except Exception as error:
-
-        raise RuntimeError(
-            f"No se pudo leer articles.json: {error}"
-        )
-
-
-# ------------------------------------------------------------
-# DESCARGAR TEXTO CIENTIFICO
-# ------------------------------------------------------------
-
-def get_full_text(pmcid):
-
-    url = (
-        f"{EUROPE_PMC}/{pmcid}/fullTextXML"
+    data = json.loads(
+        ARTICLES_FILE.read_text(encoding="utf-8")
     )
 
-    try:
+    if isinstance(data, list):
+        return {"articles": data}
 
-        content = request_url(
-            url,
-            timeout=60,
-            attempts=2
-        )
+    if not isinstance(data, dict):
+        return {"articles": []}
 
-        root = ET.fromstring(content)
+    if not isinstance(data.get("articles"), list):
+        data["articles"] = []
 
-        paragraphs = []
+    return data
 
-        for node in root.iter():
 
-            tag = node.tag.split("}")[-1]
+def existing_identifiers(data):
 
-            if tag not in ("title", "p"):
+    return {
+        str(article.get("id"))
+        for article in data["articles"]
+        if isinstance(article, dict) and article.get("id")
+    }
+
+
+# ------------------------------------------------------------
+# BUSQUEDA PUBMED
+# ------------------------------------------------------------
+
+def search_pubmed(existing_ids):
+
+    print("Buscando investigaciones en PubMed...")
+
+    query = (
+        '("Exercise"[Title/Abstract] OR '
+        '"physical activity"[Title/Abstract] OR '
+        '"sport"[Title/Abstract] OR '
+        '"sleep"[Title/Abstract] OR '
+        '"nutrition"[Title/Abstract] OR '
+        '"hydration"[Title/Abstract] OR '
+        '"muscle"[Title/Abstract] OR '
+        '"brain"[Title/Abstract]) AND '
+        '("Adolescent"[MeSH Terms] OR '
+        '"Child"[MeSH Terms] OR '
+        '"Young Adult"[MeSH Terms] OR '
+        'adolescent[Title/Abstract] OR '
+        'children[Title/Abstract] OR '
+        'youth[Title/Abstract]) AND '
+        f'("{START_YEAR}/01/01"[Date - Publication] : '
+        f'"{TODAY.isoformat()}"[Date - Publication])'
+    )
+
+    params = urllib.parse.urlencode({
+        "db": "pubmed",
+        "term": query,
+        "retmode": "json",
+        "retmax": 30,
+        "sort": "date"
+    })
+
+    url = f"{NCBI_BASE}/esearch.fcgi?{params}"
+
+    result = get_json(url)
+
+    ids = result.get("esearchresult", {}).get("idlist", [])
+
+    print(f"PubMed: {len(ids)} registros encontrados.")
+
+    if not ids:
+        return []
+
+    fetch_params = urllib.parse.urlencode({
+        "db": "pubmed",
+        "id": ",".join(ids),
+        "retmode": "xml"
+    })
+
+    xml_content = http_request(
+        f"{NCBI_BASE}/efetch.fcgi?{fetch_params}",
+        timeout=120
+    )
+
+    root = ET.fromstring(xml_content)
+
+    candidates = []
+
+    for article in root.findall(".//PubmedArticle"):
+
+        try:
+            pmid = article.findtext(
+                ".//PMID",
+                default=""
+            ).strip()
+
+            if not pmid or f"pmid-{pmid}" in existing_ids:
                 continue
 
-            text = " ".join(
-                "".join(node.itertext()).split()
+            title_node = article.find(".//ArticleTitle")
+
+            if title_node is None:
+                continue
+
+            title = " ".join(
+                "".join(title_node.itertext()).split()
             )
 
-            if len(text) > 45:
-                paragraphs.append(text)
+            abstract_parts = []
 
-        return "\n".join(paragraphs)[:16000]
+            for node in article.findall(
+                ".//Abstract/AbstractText"
+            ):
+                label = node.attrib.get("Label", "")
+                text = " ".join(
+                    "".join(node.itertext()).split()
+                )
 
-    except Exception as error:
+                if text:
+                    abstract_parts.append(
+                        f"{label}: {text}" if label else text
+                    )
 
-        print(
-            f"No se pudo descargar el texto completo "
-            f"de {pmcid}: {error}"
-        )
+            abstract = "\n".join(abstract_parts)
 
-        return ""
+            if len(abstract) < 150:
+                continue
+
+            authors = []
+
+            for author in article.findall(
+                ".//AuthorList/Author"
+            ):
+
+                last = author.findtext("LastName", "")
+                fore = author.findtext("ForeName", "")
+
+                name = " ".join(
+                    part for part in [fore, last] if part
+                )
+
+                if name:
+                    authors.append(name)
+
+            journal = article.findtext(
+                ".//Journal/Title",
+                default=""
+            )
+
+            pub_date = article.find(".//PubDate")
+
+            year = ""
+
+            if pub_date is not None:
+                year = (
+                    pub_date.findtext("Year")
+                    or pub_date.findtext("MedlineDate", "")[:4]
+                )
+
+            if not year or not year.isdigit():
+                continue
+
+            publication_year = int(year)
+
+            if publication_year < START_YEAR:
+                continue
+
+            if publication_year > TODAY.year:
+                continue
+
+            doi = ""
+
+            for identifier in article.findall(
+                ".//ArticleId"
+            ):
+                if identifier.attrib.get("IdType") == "doi":
+                    doi = identifier.text or ""
+                    break
+
+            candidates.append({
+
+                "id": f"pmid-{pmid}",
+                "source": "PubMed",
+                "title": title,
+                "authors": ", ".join(authors[:12]),
+                "journal": journal,
+                "year": publication_year,
+                "doi": doi,
+                "pmid": pmid,
+                "abstract": abstract,
+                "url": f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
+
+            })
+
+        except Exception as error:
+            print("Registro PubMed descartado:", error)
+
+    print(f"PubMed: {len(candidates)} candidatos utilizables.")
+
+    return candidates
 
 
 # ------------------------------------------------------------
-# BUSCAR INVESTIGACIONES DE LOS ULTIMOS CINCO ANOS
+# BUSQUEDA EUROPE PMC
 # ------------------------------------------------------------
 
-def find_studies(existing_ids):
+def search_europe_pmc(existing_ids):
 
-    today = date.today()
-
-    start_year = today.year - 5
-
-    start_date = date(
-        start_year,
-        today.month,
-        min(today.day, 28)
-    )
+    print("Buscando investigaciones en Europe PMC...")
 
     query = (
         'OPEN_ACCESS:Y AND HAS_ABSTRACT:Y AND '
@@ -225,108 +356,66 @@ def find_studies(existing_ids):
         'TITLE_ABS:children OR '
         'TITLE_ABS:youth OR '
         'TITLE_ABS:young) AND '
-        f'FIRST_PDATE:[{start_date.isoformat()} '
-        f'TO {today.isoformat()}]'
+        f'FIRST_PDATE:[{START_YEAR}-01-01 TO {TODAY.isoformat()}]'
     )
 
     params = urllib.parse.urlencode({
         "query": query,
         "format": "json",
-        "pageSize": 25,
+        "pageSize": 30,
         "sort": "FIRST_PDATE_D"
     })
 
-    url = (
-        f"{EUROPE_PMC}/search?{params}"
-    )
+    url = f"{EPMC_BASE}/search?{params}"
 
-    print("Buscando investigaciones en Europe PMC...")
+    result = get_json(url)
 
-    data = get_json(url)
-
-    results = data.get(
+    records = result.get(
         "resultList", {}
     ).get("result", [])
 
     candidates = []
 
-    for item in results:
+    for item in records:
 
-        pmcid = item.get("pmcid")
-        pmid = item.get("pmid")
-        doi = item.get("doi")
+        pmid = item.get("pmid", "")
+        pmcid = item.get("pmcid", "")
 
-        if not pmcid:
+        if pmid:
+            identifier = f"pmid-{pmid}"
+        elif pmcid:
+            identifier = f"pmcid-{pmcid}"
+        else:
             continue
-
-        identifier = (
-            f"pmid-{pmid}"
-            if pmid
-            else f"pmcid-{pmcid}"
-        )
 
         if identifier in existing_ids:
             continue
 
         try:
 
-            publication_date = item.get(
-                "firstPublicationDate", ""
-            )
+            year = int(item.get("pubYear", 0))
 
-            publication_year = int(
-                item.get("pubYear", 0)
-            )
-
-            if not publication_date:
+            if year < START_YEAR or year > TODAY.year:
                 continue
 
-            published = date.fromisoformat(
-                publication_date[:10]
-            )
+            abstract = item.get("abstractText", "")
 
-            if published < start_date or published > today:
+            if len(abstract) < 150:
                 continue
-
-            if not item.get("abstractText"):
-                continue
-
-            full_text = get_full_text(pmcid)
 
             candidates.append({
 
                 "id": identifier,
-
-                "title": item.get(
-                    "title", ""
-                ),
-
-                "authors": item.get(
-                    "authorString", ""
-                ),
-
-                "journal": item.get(
-                    "journalTitle", ""
-                ),
-
-                "year": publication_year,
-
-                "publication_date": publication_date,
-
-                "doi": doi or "",
-
-                "pmid": str(pmid or ""),
-
-                "pmcid": pmcid,
-
-                "abstract": item.get(
-                    "abstractText", ""
-                ),
-
-                "full_text": full_text,
-
+                "source": "Europe PMC",
+                "title": item.get("title", ""),
+                "authors": item.get("authorString", ""),
+                "journal": item.get("journalTitle", ""),
+                "year": year,
+                "doi": item.get("doi", ""),
+                "pmid": str(pmid),
+                "abstract": abstract,
                 "url": (
-                    f"https://europepmc.org/article/MED/{pmid}"
+                    f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
                     if pmid
                     else f"https://europepmc.org/article/PMC/{pmcid}"
                 )
@@ -334,24 +423,66 @@ def find_studies(existing_ids):
             })
 
         except Exception as error:
-
-            print(
-                "Estudio descartado:",
-                error
-            )
-
-            continue
+            print("Registro Europe PMC descartado:", error)
 
     print(
-        f"Investigaciones candidatas encontradas: "
-        f"{len(candidates)}"
+        f"Europe PMC: {len(candidates)} candidatos utilizables."
     )
 
     return candidates
 
 
 # ------------------------------------------------------------
-# REDACTAR ARTICULO CON GEMINI
+# COMBINAR Y EVITAR DUPLICADOS
+# ------------------------------------------------------------
+
+def collect_studies(data):
+
+    identifiers = existing_identifiers(data)
+
+    candidates = []
+    seen = set(identifiers)
+
+    for search_function in (
+        search_pubmed,
+        search_europe_pmc
+    ):
+
+        try:
+
+            results = search_function(seen)
+
+            for study in results:
+
+                identifier = study["id"]
+
+                if identifier in seen:
+                    continue
+
+                seen.add(identifier)
+                candidates.append(study)
+
+        except Exception as error:
+
+            print(
+                f"Fuente {search_function.__name__} no disponible: "
+                f"{error}"
+            )
+
+    candidates.sort(
+        key=lambda item: item["year"],
+        reverse=True
+    )
+
+    print(
+        f"Total de estudios candidatos: {len(candidates)}"
+    )
+
+    return candidates
+
+
+# ------------------------------------------------------------
+# GENERAR ARTICULO CON GEMINI
 # ------------------------------------------------------------
 
 def generate_article(study):
@@ -359,98 +490,86 @@ def generate_article(study):
     prompt = f"""
 Eres el redactor cientifico de SPORT LAB.
 
-SPORT LAB es una plataforma educativa para estudiantes
-espanoles de Educacion Secundaria Obligatoria (12-16 anos).
+Tu publico son estudiantes espanoles de ESO de 12 a 16 anos.
 
-Debes redactar un articulo educativo atractivo y riguroso.
+Redacta un articulo atractivo, claro y cientificamente riguroso.
 
-REGLAS OBLIGATORIAS:
+REGLAS:
 
-1. Utiliza exclusivamente los datos del estudio proporcionado.
-2. No inventes autores, resultados, cifras ni conclusiones.
-3. No confundas correlacion con causalidad.
-4. Explica las limitaciones de la investigacion.
-5. Utiliza lenguaje comprensible para adolescentes.
-6. No des consejos medicos individuales.
-7. Si la evidencia no permite una explicacion fiable,
-   devuelve publish=false.
-8. No presentes hipotesis como hechos demostrados.
+- Utiliza exclusivamente la informacion del estudio.
+- No inventes resultados ni cifras.
+- No inventes autores ni referencias.
+- Distingue correlacion de causalidad.
+- Explica las limitaciones.
+- No des consejos medicos individuales.
+- No conviertas una hipotesis en un resultado demostrado.
+- Si el estudio no permite una explicacion fiable, publica=false.
 
-Devuelve exclusivamente JSON valido.
-
-ESTRUCTURA:
+Devuelve exclusivamente JSON valido con esta estructura:
 
 {{
   "publish": true,
   "category": "Rendimiento",
   "icon": "🏃",
   "type": "Investigacion cientifica",
-  "title": "Pregunta atractiva para adolescentes",
-  "teaser": "Resumen breve y atractivo",
-  "question": "Pregunta principal del articulo",
-  "study": "Que investigaron los cientificos",
-  "method": "Como realizaron la investigacion",
-  "results": "Resultados que encontraron",
-  "explained": "Explicacion sencilla para ESO",
+  "title": "Pregunta atractiva",
+  "teaser": "Resumen breve",
+  "question": "Pregunta principal",
+  "study": "Que investigaron",
+  "method": "Como lo investigaron",
+  "results": "Resultados reales",
+  "explained": "Explicacion para estudiantes de ESO",
   "limits": "Limitaciones del estudio",
-  "takeaway": "Idea cientifica principal",
+  "takeaway": "Idea clave",
   "read_minutes": 5,
   "quiz": [
     {{
-      "q": "Pregunta de comprension",
-      "options": ["Opcion A", "Opcion B", "Opcion C"],
+      "q": "Pregunta",
+      "options": ["A", "B", "C"],
       "correct": 0,
-      "explanation": "Explicacion de la respuesta"
+      "explanation": "Explicacion"
     }}
   ]
 }}
 
-REQUISITOS DEL CUESTIONARIO:
+REQUISITOS DEL QUIZ:
 
 - Exactamente cinco preguntas.
 - Tres opciones por pregunta.
-- Una sola respuesta correcta.
+- Una unica respuesta correcta.
 - Preguntas basadas en el estudio.
-- Explicaciones claras.
+- Explicaciones comprensibles.
 
-CATEGORIAS PERMITIDAS:
+CATEGORIAS:
 
 {", ".join(CATEGORIES)}
 
-REFERENCIA ORIGINAL:
+REFERENCIA:
 
+Fuente: {study["source"]}
 Titulo: {study["title"]}
 Autores: {study["authors"]}
 Revista: {study["journal"]}
 Ano: {study["year"]}
 DOI: {study["doi"]}
 PMID: {study["pmid"]}
+Enlace: {study["url"]}
 
-RESUMEN CIENTIFICO:
+RESUMEN ORIGINAL:
 
 {study["abstract"]}
-
-TEXTO COMPLETO DISPONIBLE:
-
-{study["full_text"][:16000]}
 """
 
     payload = {
-
         "contents": [{
             "parts": [{
                 "text": prompt
             }]
         }],
-
         "generationConfig": {
-
             "temperature": 0.2,
-
             "responseMimeType": "application/json"
-
         }
-
     }
 
     url = (
@@ -461,42 +580,16 @@ TEXTO COMPLETO DISPONIBLE:
         })
     )
 
-    request = urllib.request.Request(
+    body = json.dumps(payload).encode("utf-8")
 
+    content = http_request(
         url,
-
-        data=json.dumps(payload).encode("utf-8"),
-
-        headers={
-            "Content-Type": "application/json"
-        },
-
-        method="POST"
-
+        data=body,
+        timeout=120,
+        attempts=3
     )
 
-    try:
-
-        with urllib.request.urlopen(
-            request,
-            timeout=120
-        ) as response:
-
-            result = json.loads(
-                response.read().decode("utf-8")
-            )
-
-    except urllib.error.HTTPError as error:
-
-        detail = error.read().decode(
-            "utf-8",
-            errors="replace"
-        )
-
-        raise RuntimeError(
-            f"Error de Gemini HTTP {error.code}: "
-            f"{detail[:1000]}"
-        )
+    result = json.loads(content.decode("utf-8"))
 
     text = (
         result["candidates"][0]
@@ -518,24 +611,13 @@ def validate_article(article):
     if article.get("publish") is not True:
         return False
 
-    required_fields = [
-
-        "category",
-        "icon",
-        "type",
-        "title",
-        "teaser",
-        "question",
-        "study",
-        "method",
-        "results",
-        "explained",
-        "limits",
-        "takeaway"
-
+    required = [
+        "category", "icon", "type", "title", "teaser",
+        "question", "study", "method", "results",
+        "explained", "limits", "takeaway"
     ]
 
-    for field in required_fields:
+    for field in required:
 
         value = article.get(field)
 
@@ -563,10 +645,13 @@ def validate_article(article):
 
         options = question.get("options")
 
-        if not isinstance(options, list):
+        if not isinstance(options, list) or len(options) != 3:
             return False
 
-        if len(options) != 3:
+        if any(
+            not isinstance(option, str) or not option.strip()
+            for option in options
+        ):
             return False
 
         if type(question.get("correct")) is not int:
@@ -575,9 +660,10 @@ def validate_article(article):
         if question["correct"] not in (0, 1, 2):
             return False
 
-        if not isinstance(
-            question.get("explanation"), str
-        ):
+        if not isinstance(question.get("explanation"), str):
+            return False
+
+        if len(question["explanation"].strip()) < 8:
             return False
 
     return True
@@ -589,34 +675,24 @@ def validate_article(article):
 
 def save_article(data, study, generated):
 
-    today = date.today()
-
     article = {
 
         "id": study["id"],
+        "source": study["source"],
 
         "category": generated["category"],
-
         "icon": generated["icon"],
-
         "type": generated["type"],
 
         "title": generated["title"],
-
         "teaser": generated["teaser"],
-
         "question": generated["question"],
 
         "study": generated["study"],
-
         "method": generated["method"],
-
         "results": generated["results"],
-
         "explained": generated["explained"],
-
         "limits": generated["limits"],
-
         "takeaway": generated["takeaway"],
 
         "read_minutes": int(
@@ -626,57 +702,38 @@ def save_article(data, study, generated):
         "quiz": generated["quiz"],
 
         "authors": study["authors"],
-
         "paper_title": study["title"],
-
         "journal": study["journal"],
-
         "year": study["year"],
-
         "doi": study["doi"],
-
         "pmid": study["pmid"],
-
-        "pmcid": study["pmcid"],
-
         "url": study["url"],
 
-        "published_at": today.isoformat(),
-
+        "published_at": TODAY.isoformat(),
         "evidence_window_years": 5
 
     }
 
     data["articles"].insert(0, article)
 
-    data["updated_at"] = today.isoformat()
+    data["updated_at"] = TODAY.isoformat()
 
     data["automation"] = {
-
-        "source": "Europe PMC",
-
+        "sources": ["PubMed", "Europe PMC"],
         "model": GEMINI_MODEL,
-
         "period": "Ultimos cinco anos"
-
     }
 
     ARTICLES_FILE.write_text(
-
         json.dumps(
             data,
             ensure_ascii=False,
             indent=2
         ) + "\n",
-
         encoding="utf-8"
-
     )
 
-    print(
-        "ARTICULO GUARDADO:",
-        article["title"]
-    )
+    print("ARTICULO GUARDADO:", article["title"])
 
 
 # ------------------------------------------------------------
@@ -685,57 +742,44 @@ def save_article(data, study, generated):
 
 def main():
 
-    print("===================================")
-    print("        SPORT LAB AUTOMATICO")
-    print("===================================")
+    print("====================================")
+    print("          SPORT LAB")
+    print("     MOTOR CIENTIFICO AUTOMATICO")
+    print("====================================")
 
     if not GEMINI_API_KEY:
-
         raise RuntimeError(
-            "Falta GEMINI_API_KEY. "
-            "Configura el secreto en GitHub Actions."
+            "Falta GEMINI_API_KEY en GitHub Secrets."
         )
 
-    madrid_now = datetime.now(
-        timezone.utc
-    ).astimezone(
-        ZoneInfo("Europe/Madrid")
-    )
-
     print(
-        "Fecha y hora de Madrid:",
-        madrid_now.isoformat()
+        "Fecha:",
+        datetime.now(
+            timezone.utc
+        ).astimezone(
+            ZoneInfo("Europe/Madrid")
+        ).isoformat()
     )
 
     data = load_articles()
 
-    existing_ids = {
-
-        article.get("id")
-
-        for article in data["articles"]
-
-        if isinstance(article, dict)
-
-    }
-
-    candidates = find_studies(existing_ids)
+    candidates = collect_studies(data)
 
     if not candidates:
 
         print(
-            "No se encontraron estudios adecuados. "
+            "No hay estudios adecuados. "
             "No se publicara contenido de relleno."
         )
 
         return
 
-    for study in candidates[:5]:
+    for study in candidates[:8]:
 
         try:
 
             print(
-                "Analizando:",
+                "Analizando estudio:",
                 study["title"]
             )
 
@@ -744,7 +788,8 @@ def main():
             if not validate_article(generated):
 
                 print(
-                    "Articulo descartado por validacion."
+                    "Estudio descartado: "
+                    "el articulo no supera la validacion."
                 )
 
                 continue
@@ -755,23 +800,21 @@ def main():
                 generated
             )
 
-            print(
-                "PUBLICACION COMPLETADA CORRECTAMENTE."
-            )
+            print("PUBLICACION COMPLETADA.")
 
             return
 
         except Exception as error:
 
             print(
-                "Error procesando estudio:",
+                "No se pudo procesar este estudio:",
                 error
             )
 
             continue
 
     print(
-        "No se pudo generar un articulo que "
+        "No se encontro ningun articulo que "
         "superara las comprobaciones."
     )
 
