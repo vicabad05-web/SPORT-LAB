@@ -5,17 +5,16 @@ import time
 import re
 import urllib.request
 import urllib.parse
-import urllib.error
 import xml.etree.ElementTree as ET
 from datetime import date, timedelta
 from pathlib import Path
 
-# =========================================================
-# CONFIGURACION
-# =========================================================
+# =====================================================
+# CONFIGURACION GENERAL
+# =====================================================
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.5-flash-lite"
 
 DATA_FILE = Path("data/articles.json")
 MAX_ARTICLES_PER_RUN = 1
@@ -27,16 +26,14 @@ EUROPE_PMC_BASE = "https://www.ebi.ac.uk/europepmc/webservices/rest/"
 USER_AGENT = "SPORT-LAB-Educational-Project/1.0"
 
 
-# =========================================================
-# PETICIONES HTTP CON REINTENTOS
-# =========================================================
+# =====================================================
+# PETICIONES HTTP
+# =====================================================
 
 def http_request(url, data=None, timeout=60, attempts=3,
                  content_type=None):
 
-    headers = {
-        "User-Agent": USER_AGENT
-    }
+    headers = {"User-Agent": USER_AGENT}
 
     if data is not None:
         headers["Content-Type"] = (
@@ -73,14 +70,13 @@ def http_request(url, data=None, timeout=60, attempts=3,
     )
 
 
-# =========================================================
-# FECHA Y ARTICULOS YA PUBLICADOS
-# =========================================================
+# =====================================================
+# FECHAS Y ARTICULOS EXISTENTES
+# =====================================================
 
 def get_date_range():
     end_date = date.today()
     start_date = end_date - timedelta(days=365 * YEARS_BACK)
-
     return start_date, end_date
 
 
@@ -100,7 +96,7 @@ def load_existing_articles():
         return data
 
     except Exception as error:
-        print(f"No se pudo leer el archivo de artículos: {error}")
+        print(f"Error leyendo artículos: {error}")
         return {"articles": []}
 
 
@@ -108,23 +104,18 @@ def get_existing_ids(articles):
     identifiers = set()
 
     for article in articles:
-        for field in ("doi", "pmid"):
+        for field in ("doi", "pmid", "id"):
             value = article.get(field)
 
             if value:
                 identifiers.add(str(value).lower())
 
-        article_id = article.get("id")
-
-        if article_id:
-            identifiers.add(str(article_id).lower())
-
     return identifiers
 
 
-# =========================================================
+# =====================================================
 # BUSQUEDA EN PUBMED
-# =========================================================
+# =====================================================
 
 def search_pubmed(existing_ids):
     print("Buscando investigaciones en PubMed...")
@@ -134,7 +125,7 @@ def search_pubmed(existing_ids):
     search_terms = (
         '(exercise OR sport OR "physical activity" '
         'OR training OR sports science)'
-        ' AND (humans[MeSH Terms])'
+        ' AND humans[MeSH Terms]'
     )
 
     params = {
@@ -177,10 +168,7 @@ def search_pubmed(existing_ids):
     for item in root.findall(".//PubmedArticle"):
         pmid = item.findtext(".//PMID")
 
-        if not pmid:
-            continue
-
-        if pmid.lower() in existing_ids:
+        if not pmid or pmid.lower() in existing_ids:
             continue
 
         title = item.findtext(".//ArticleTitle") or ""
@@ -231,9 +219,9 @@ def search_pubmed(existing_ids):
     return candidates
 
 
-# =========================================================
+# =====================================================
 # BUSQUEDA EN EUROPE PMC
-# =========================================================
+# =====================================================
 
 def search_europe_pmc(existing_ids):
     print("Buscando investigaciones en Europe PMC...")
@@ -307,26 +295,23 @@ def search_europe_pmc(existing_ids):
     return candidates
 
 
-# =========================================================
-# BUSQUEDA COMBINADA: SI UNA FALLA, CONTINUA LA OTRA
-# =========================================================
+# =====================================================
+# BUSQUEDA COMBINADA
+# =====================================================
 
 def find_studies(existing_ids):
     candidates = []
 
-    # Primero PubMed
     try:
         candidates.extend(search_pubmed(existing_ids))
     except Exception as error:
         print(f"AVISO: PubMed no disponible: {error}")
 
-    # Después Europe PMC
     try:
         candidates.extend(search_europe_pmc(existing_ids))
     except Exception as error:
         print(f"AVISO: Europe PMC no disponible: {error}")
 
-    # Eliminar duplicados
     unique = []
     seen = set()
 
@@ -342,15 +327,15 @@ def find_studies(existing_ids):
             unique.append(item)
 
     if not unique:
-        print("No se han podido obtener estudios de ninguna fuente.")
+        print("No se han podido obtener estudios.")
         return []
 
     return unique
 
 
-# =========================================================
+# =====================================================
 # GENERACION DEL ARTICULO CON GEMINI
-# =========================================================
+# =====================================================
 
 def generate_article(study):
     if not GEMINI_API_KEY:
@@ -363,18 +348,20 @@ Eres el redactor científico de SPORT LAB, una plataforma
 educativa de ciencias del deporte para estudiantes de ESO
 de entre 12 y 16 años.
 
-Debes transformar el siguiente estudio científico en un
-artículo educativo riguroso, atractivo y fácil de entender.
+Transforma el siguiente estudio científico en un artículo
+educativo riguroso, atractivo y fácil de entender.
 
 ESTUDIO ORIGINAL:
+
 Título: {study['title']}
 Revista: {study['journal']}
 Año: {study['year']}
 Resumen: {study['abstract']}
 
 REGLAS:
+
 - No inventes resultados ni conclusiones.
-- No inventes cifras que no aparezcan en el estudio.
+- No inventes cifras.
 - Explica los conceptos para estudiantes de 12 a 16 años.
 - Diferencia resultados de interpretaciones.
 - Explica las limitaciones del estudio.
@@ -384,8 +371,8 @@ REGLAS:
 - El artículo debe ser claro, atractivo y didáctico.
 - Incluye exactamente 5 preguntas tipo test.
 - Cada pregunta debe tener 4 opciones.
-- La respuesta correcta debe indicarse mediante el número
-  de opción, empezando por 0.
+- La respuesta correcta se indica mediante un número
+  de opción empezando por 0.
 
 Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
 
@@ -406,7 +393,12 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
   "quiz": [
     {{
       "question": "Pregunta",
-      "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
+      "options": [
+        "Opción A",
+        "Opción B",
+        "Opción C",
+        "Opción D"
+      ],
       "correct": 0,
       "explanation": "Explicación de la respuesta"
     }}
@@ -419,7 +411,7 @@ Biomecánica o Psicología deportiva.
 """
 
     url = (
-        f"https://generativelanguage.googleapis.com/v1beta/models/"
+        "https://generativelanguage.googleapis.com/v1beta/models/"
         f"{GEMINI_MODEL}:generateContent?"
         f"key={urllib.parse.quote(GEMINI_API_KEY)}"
     )
@@ -465,10 +457,10 @@ Biomecánica o Psicología deportiva.
 
     for field in required_fields:
         if field not in article:
-            raise ValueError(f"Falta el campo obligatorio: {field}")
+            raise ValueError(f"Falta el campo: {field}")
 
     if len(article["quiz"]) != 5:
-        raise ValueError("El artículo debe contener 5 preguntas.")
+        raise ValueError("El artículo debe tener 5 preguntas.")
 
     for question in article["quiz"]:
         if (
@@ -480,9 +472,9 @@ Biomecánica o Psicología deportiva.
     return article
 
 
-# =========================================================
+# =====================================================
 # GUARDAR ARTICULO
-# =========================================================
+# =====================================================
 
 def save_article(article, study, existing_data):
     today = date.today().isoformat()
@@ -518,9 +510,9 @@ def save_article(article, study, existing_data):
     print(f"Título: {article['title']}")
 
 
-# =========================================================
+# =====================================================
 # PROGRAMA PRINCIPAL
-# =========================================================
+# =====================================================
 
 def main():
     print("===================================")
@@ -528,9 +520,13 @@ def main():
     print("===================================")
 
     print(f"Fecha: {date.today().isoformat()}")
+    print(f"Modelo Gemini: {GEMINI_MODEL}")
 
     existing_data = load_existing_articles()
-    existing_ids = get_existing_ids(existing_data["articles"])
+
+    existing_ids = get_existing_ids(
+        existing_data["articles"]
+    )
 
     candidates = find_studies(existing_ids)
 
@@ -546,7 +542,13 @@ def main():
 
         try:
             article = generate_article(study)
-            save_article(article, study, existing_data)
+
+            save_article(
+                article,
+                study,
+                existing_data
+            )
+
             published += 1
             break
 
