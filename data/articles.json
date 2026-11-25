@@ -1,3 +1,87 @@
 {
-  "articles": []
+  "articles": [
+    {
+      "category": "Salud",
+      "icon": "🧬",
+      "type": "Investigación",
+      "title": "El mapa oculto del VIH: vigilando la resistencia a los medicamentos",
+      "teaser": "Un estudio científico revela cómo se propaga una cepa resistente del VIH en una región de China, utilizando mapas de redes genéticas.",
+      "question": "¿Sabías que los virus también pueden volverse \"resistentes\" a los medicamentos, igual que las bacterias?",
+      "study": "Los científicos investigaron cuál es la situación de la resistencia a los medicamentos transmitidos (TDR) del VIH-1 en personas recién diagnosticadas en cuatro ciudades del sur de la provincia de Sichuan (China) entre julio de 2022 y junio de 2023. Su objetivo era comprender cómo se propaga esta resistencia para mejorar la prevención.",
+      "method": "El estudio incluyó a 3.596 personas recién diagnosticadas y sin tratamiento previo. Los investigadores analizaron muestras de sangre para obtener secuencias genéticas del virus (concretamente en la región pol). Además, utilizaron herramientas estadísticas y análisis de redes moleculares para ver qué factores estaban relacionados con la resistencia y cómo se transmitía el virus entre las personas y las ciudades.",
+      "results": "De los pacientes analizados, se obtuvieron secuencias genéticas en 3.088 casos. La tasa global de resistencia del VIH fue del 11,24% (347 de 3.088), lo que la sitúa en el nivel de epidemia moderada según la Organización Mundial de la Salud (OMS). Los medicamentos que más fallaban (con mayor resistencia) eran los inhibidores no análogos de la transcriptasa inversa (NNRTIs), destacando las mutaciones llamadas K103N/S. El análisis estadístico asoció tener estudios de secundaria o formación profesional con un menor riesgo de resistencia, mientras que estar infectado por subtipos virales específicos (como CRF55_01B o el subtipo B) o vivir en las ciudades de Luzhou y Zigong se asoció con un mayor riesgo. Además, el 47,26% de las personas con virus resistentes formaban parte de una red local de transmisión conectada genéticamente.",
+      "explained": "Para entenderlo, imagina que los virus son como equipos que compiten contra las medicinas (antivirales). A veces, el virus muta (cambia una pequeña parte de su código genético, como las letras de un libro de instrucciones) y se vuelve inmune a ciertos fármacos. Si una persona se infecta directamente con un virus que ya tiene esa mutación, los medicamentos habituales funcionarán peor desde el primer día; esto es lo que se llama resistencia transmitida. El estudio también demuestra que los virus con características genéticas similares viajan y se agrupan en redes de contagio locales, formando una especie de mapa de conexiones entre personas y zonas geográficas.",
+      "limits": "El estudio tiene limitaciones: al ser un análisis transversal en un momento concreto, observa correlaciones estadísticas pero no puede asegurar una causa directa y absoluta (por ejemplo, factores sociales asociados no significan que causen directamente la resistencia). Además, se centra en una región concreta del sur de Sichuan, por lo que sus datos no se pueden aplicar automáticamente a todo el planeta.",
+      "takeaway": "La resistencia a los medicamentos del VIH puede transmitirse y alcanzar niveles moderados en una población, estando influenciada por factores genéticos del virus y patrones geográficos que se pueden rastrear con la ciencia de los datos.",
+      "read_minutes": 5,
+      "quiz": [
+        {
+          "question": "¿Qué nivel de epidemia de resistencia al VIH alcanzó la región estudiada según los criterios de la OMS?",
+          "options": [
+            "Nivel bajo",
+            "Nivel moderado",
+            "Nivel extremadamente alto",
+            "No se pudo determinar"
+          ],
+          "correct": 1,
+          "explanation": "El estudio indica que la tasa global de resistencia fue del 11,24%, alcanzando el nivel de epidemia moderada establecido por la OMS."
+        },
+        {
+          "question": "¿Qué grupo de medicamentos mostró las tasas más altas de resistencia en el estudio?",
+          "options": [
+            "Inhibidores de la proteasa",
+            "Inhibidores de la integrasa",
+            "Inhibidores no análogos de la transcriptasa inversa (NNRTIs)",
+            "Vacunas preventivas"
+          ],
+          "correct": 2,
+          "explanation": "Los resultados muestran que la resistencia a los NNRTIs fue del 8,84%, destacando fármacos como la nevirapine y el efavirenz."
+        },
+        {
+          "question": "Según el análisis estadístico, ¿qué factor se asoció con un menor riesgo de resistencia a los medicamentos?",
+          "options": [
+            "Tener estudios de secundaria o formación profesional",
+            "Vivir en la ciudad de Luzhou",
+            "Estar infectado por el subtipo B",
+            "Pertenecer a una red molecular amplia"
+          ],
+          "correct": 0,
+          "explanation": "El análisis multivariante mostró que tener un nivel educativo de secundaria o escuela profesional estaba asociado con un menor riesgo de resistencia (aOR=0.34)."
+        },
+        {
+          "question": "¿Qué herramienta utilizaron los científicos para estudiar los patrones de transmisión del virus?",
+          "options": [
+            "Simulaciones de realidad virtual",
+            "Redes moleculares y análisis espacial",
+            "Cuestionarios psicológicos a los pacientes",
+            "Pruebas de esfuerzo físico"
+          ],
+          "correct": 1,
+          "explanation": "Los investigadores emplearon métodos de redes moleculares y análisis espacial para revelar cómo se agrupaban y transmitían las cepas resistentes."
+        },
+        {
+          "question": "Una de las limitaciones del estudio es que...",
+          "options": [
+            "Demuestra causas biológicas absolutas sin margen de error",
+            "Solo se puede aplicar a la población de todo el mundo por igual",
+            "Es un estudio transversal que muestra asociaciones, pero no relaciones de causa directa",
+            "Incluyó a más de un millón de pacientes"
+          ],
+          "correct": 2,
+          "explanation": "Al tratarse de un estudio transversal en una región y periodo concretos, muestra asociaciones estadísticas pero no causalidad absoluta, y sus datos son locales."
+        }
+      ],
+      "id": "43080034",
+      "authors": "",
+      "paper_title": "[Transmissible drug resistance characteristics, influencing factors and HIV-1 molecular transmission network of newly reported HIV-1-infected patients in the southern region of Sichuan Province].",
+      "journal": "Zhonghua liu xing bing xue za zhi = Zhonghua liuxingbingxue zazhi",
+      "year": "2026",
+      "doi": "10.3760/cma.j.cn112338-20260318-00169",
+      "pmid": "43080034",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/43080034/",
+      "source": "PubMed",
+      "published_at": "2026-11-25",
+      "evidence_window_years": 5
+    }
+  ]
 }
