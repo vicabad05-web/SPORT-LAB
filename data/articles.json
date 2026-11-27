@@ -2,6 +2,101 @@
   "articles": [
     {
       "category": "Salud",
+      "icon": "🧠",
+      "type": "Investigación",
+      "title": "¿Puede el ejercicio y la relajación combatir el agotamiento en el trabajo?",
+      "teaser": "Un estudio analiza cómo combinar ejercicio físico, escritura y realidad virtual ayuda a reducir el estrés crónico de los profesionales sanitarios.",
+      "question": "¿Crees que hacer ejercicio y usar técnicas de relajación puede mejorar el bienestar mental de los trabajadores?",
+      "study": "Los investigadores querían comprobar si un programa de atención plena y bienestar que incluía ejercicio físico, escritura y realidad virtual podía reducir los síntomas de agotamiento laboral (conocido como 'burnout') en enfermeras de psiquiatría.",
+      "method": "Participaron 21 enfermeras de una unidad psiquiátrica de agudos. Durante ocho semanas, realizaron prácticas que incluían ejercicio, escritura en diario y sesiones de realidad virtual al menos tres veces por semana. Midieron sus niveles de agotamiento antes y después del programa usando un cuestionario especializado llamado Inventario de Burnout de Maslach.",
+      "results": "Debido a que algunas personas abandonaron el estudio, se analizaron los datos de 17 participantes. Los resultados mostraron mejoras estadísticamente significativas en tres áreas del agotamiento medida por el cuestionario tras el programa.",
+      "explained": "El estudio sugiere que introducir actividades como el ejercicio físico y técnicas de mindfulness en la rutina puede ayudar a manejar mejor el estrés laboral y proteger la salud mental. No obstante, los científicos recuerdan que los datos sugieren una relación, pero se necesitan estudios más amplios para confirmarlo del todo.",
+      "limits": "El estudio cuenta con una muestra pequeña de participantes y sufrió bajas durante el proceso (desgaste), por lo que los autores recomiendan realizar futuras investigaciones con grupos más grandes y diversos.",
+      "takeaway": "Combinar ejercicio físico y prácticas de atención plena puede ser una herramienta útil para reducir los síntomas de agotamiento laboral y mejorar el bienestar.",
+      "read_minutes": 5,
+      "quiz": [
+        {
+          "question": "¿Qué tres prácticas combinaba principalmente el programa del estudio?",
+          "options": [
+            "Nutrición, natación y lectura",
+            "Ejercicio, escritura en diario y realidad virtual",
+            "Yoga, meditación en silencio y pintura",
+            "Descanso, carrera continua y música"
+          ],
+          "correct": 1,
+          "explanation": "El programa evaluado utilizaba ejercicio, escritura (journaling) y realidad virtual al menos tres veces por semana."
+        },
+        {
+          "question": "¿Qué herramienta se utilizó para medir los síntomas de agotamiento?",
+          "options": [
+            "Un test de fuerza muscular",
+            "El Inventario de Burnout de Maslach",
+            "Una prueba de resistencia aeróbica",
+            "Un cuestionario de nutrición"
+          ],
+          "correct": 1,
+          "explanation": "Los síntomas de agotamiento se midieron utilizando el Maslach Burnout Inventory (MBI)."
+        },
+        {
+          "question": "¿Cuántas semanas duró la intervención del estudio?",
+          "options": [
+            "4 semanas",
+            "6 semanas",
+            "8 semanas",
+            "12 semanas"
+          ],
+          "correct": 2,
+          "explanation": "Las participantes realizaron las prácticas durante un periodo de ocho semanas."
+        },
+        {
+          "question": "¿Qué limitación principal presentaba la muestra del estudio?",
+          "options": [
+            "Participaron miles de personas de todo el mundo",
+            "Era un grupo pequeño y sufrió pérdidas de participantes",
+            "Solo participaron deportistas profesionales",
+            "No se usaron cuestionarios"
+          ],
+          "correct": 1,
+          "explanation": "El estudio comenzó con 21 enfermeras y terminó analizando los datos de 17 debido al abandono de algunas participantes."
+        },
+        {
+          "question": "¿Qué sugieren los hallazgos de la investigación?",
+          "options": [
+            "Que el ejercicio cura cualquier enfermedad",
+            "Que las intervenciones de mindfulness pueden reducir los síntomas de agotamiento",
+            "Que la realidad virtual sustituye por completo al deporte",
+            "Que el trabajo en hospitales no genera estrés"
+          ],
+          "correct": 1,
+          "explanation": "Los resultados sugieren que este tipo de programas basados en mindfulness y ejercicio pueden ayudar a reducir los síntomas de agotamiento laboral."
+        }
+      ],
+      "scientific_score": 73,
+      "scientific_threshold": 70,
+      "scientific_score_breakdown": {
+        "relevance": 20,
+        "methodology": 15,
+        "analysis": 15,
+        "sample_or_sources": 13,
+        "transparency": 10
+      },
+      "study_design": "Diseño cuasiexperimental pre-post",
+      "scientific_reason": "El estudio es relevante para la psicología deportiva y la salud al investigar el ejercicio y el mindfulness frente al agotamiento laboral. Utiliza un diseño cuasiexperimental con pruebas antes y después y test estadísticos (t de Student). Presenta limitaciones de tamaño muestral (21 participantes iniciales, 17 analizados por desgaste) y recomienda cautela y más investigación, cumpliendo criterios de transparencia. Su puntuación total es de 73, superando el corte de 70.",
+      "ai_model": "gemini-3.5-flash-lite",
+      "id": "43098605",
+      "authors": "",
+      "paper_title": "A multifaceted approach to mitigating psychiatric nurse burnout: Exercise, journaling, and virtual reality.",
+      "journal": "Archives of psychiatric nursing",
+      "year": "2026",
+      "doi": "10.1016/j.apnu.2026.152264",
+      "pmid": "43098605",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/43098605/",
+      "source": "PubMed",
+      "published_at": "2026-11-27",
+      "evidence_window_years": 5
+    },
+    {
+      "category": "Salud",
       "icon": "🏋️‍♀️",
       "type": "Investigación",
       "title": "¿Se puede ganar fuerza muscular durante el tratamiento con quimioterapia?",
